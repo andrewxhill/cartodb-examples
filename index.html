@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #save {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        height: 40px;
+        width: 80px;
+        z-index:1000;
+        font-weight: bold;
+        font-size: 22px;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+
+  </head>
+    
+  <body>
+    <div id="map"></div>
+    <button id="save">save</button>
+  </body>
+
+
+  <!-- include cartodb.js library -->
+  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+  <script>
+
+    function main() {
+
+      var map = L.map('map', { 
+        zoomControl: true,
+        center: [44.9910709235921, -93.26337005615234],
+        zoom: 11
+      })
+
+      var sql = new cartodb.SQL({ user: 'viz2', format: 'geojson' });
+
+      L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+        attribution: 'Stamen'
+      }).addTo(map);
+
+      var mpoly;
+
+      $("#save").click(function(){
+        console.log(mpoly)
+      });
+
+      sql.execute("SELECT (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT the_geom FROM minneapolis ORDER BY cartodb_id DESC LIMIT 1) a").done(function(geojson) {
+        var minneapolis = [];
+        $.each(geojson.features, function(i,f){
+          minneapolis.push([f.geometry.coordinates[1],f.geometry.coordinates[0]])
+        });
+        mpoly = new L.Polygon(minneapolis);
+
+        mpoly.editing.enable();
+        map.addLayer(mpoly);
+
+      });
+
+    }
+
+    window.onload = main;
+
+  </script>
+
+
+</html>
