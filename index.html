@@ -26,14 +26,12 @@
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
     <![endif]-->
-
   </head>
     
   <body>
     <div id="map"></div>
     <button id="save">save</button>
   </body>
-
 
   <!-- include cartodb.js library -->
   <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
@@ -42,14 +40,16 @@
   <script>
 
     function main() {
-
+      var id;
       var map = L.map('map', { 
         zoomControl: true,
-        center: [44.9910709235921, -93.26337005615234],
-        zoom: 11
+        center: [40.9910709235921, -93.26337005615234],
+        zoom: 5
       })
 
-      var sql = new cartodb.SQL({ user: 'viz2', format: 'geojson' });
+      var user = 'viz2';
+      var table = 'midwest';
+      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
 
       L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
         attribution: 'Stamen'
@@ -57,16 +57,44 @@
 
       var mpoly;
 
+      var ship = function(poly){
+        //Function uses our security definer query to insert data using a GET request
+        var statement = "SELECT AXH_NewMidwest("+id+",ST_SetSRID(ST_GeomFromText('"+poly+"'),4326)) id";
+        cdb_json.execute(statement).done(function(json){
+          console.log(json)
+          //set new identifier
+          document.location.hash = json.rows[0].id;
+        }).error(function(){
+          //sorry your polygon is ugly
+        })
+      }
+
       $("#save").click(function(){
-        console.log(mpoly)
+        // if (mpoly.edited){
+          var polygon = 'MULTIPOLYGON(((';
+          $.each(mpoly._latlngs, function(i, c){
+            polygon += c.lng + ' ' + c.lat + ', '
+          })
+          polygon += mpoly._latlngs[0].lng + ' ' + mpoly._latlngs[0].lat + ')))';
+          ship(polygon)
+        // }
       });
 
-      sql.execute("SELECT (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT the_geom FROM minneapolis ORDER BY cartodb_id DESC LIMIT 1) a").done(function(geojson) {
-        var minneapolis = [];
+      var query;
+      var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+      if(window.location.hash.substring(1)){
+        id = window.location.hash.substring(1)
+        query = "SELECT cartodb_id, (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT cartodb_id, the_geom FROM "+table+" WHERE cartodb_id = "+id+") a";
+      } else {
+        query = "SELECT cartodb_id, (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT cartodb_id, the_geom FROM "+table+" ORDER BY cartodb_id DESC LIMIT 1) a";
+      }
+      cdb_geojson.execute(query).done(function(geojson) {
+        id = geojson.features[0].properties.cartodb_id;
+        var polygon = [];
         $.each(geojson.features, function(i,f){
-          minneapolis.push([f.geometry.coordinates[1],f.geometry.coordinates[0]])
+          polygon.push([f.geometry.coordinates[1],f.geometry.coordinates[0]])
         });
-        mpoly = new L.Polygon(minneapolis);
+        mpoly = new L.Polygon(polygon);
 
         mpoly.editing.enable();
         map.addLayer(mpoly);
@@ -74,9 +102,7 @@
       });
 
     }
-
     window.onload = main;
-
   </script>
 
 
