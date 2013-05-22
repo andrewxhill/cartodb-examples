@@ -57,6 +57,8 @@
     <button id="save">save</button>
     <div id="footer">
       Edit the polygon for <i>Minneapolis</i> to the shape you think it should be. Save it. Then share the URL with others to modify further.
+      <br/>
+      <a href="polygon-size.html">see all edits</a>
     </div>
   </body>
 
@@ -86,7 +88,7 @@
 
       var ship = function(poly){
         //Function uses our security definer query to insert data using a GET request
-        var statement = "SELECT AXH_NewMinneapolis("+id+",ST_SetSRID(ST_GeomFromText('"+poly+"'),4326)) id";
+        var statement = "SELECT AXH_NewMinneapolis("+id+",ST_SetSRID(ST_Multi(ST_GeomFromText('"+poly+"')),4326)) id";
         cdb_json.execute(statement).done(function(json){
           console.log(json)
           //set new identifier
@@ -98,11 +100,11 @@
 
       $("#save").click(function(){
         // if (mpoly.edited){
-          var polygon = 'MULTIPOLYGON(((';
+          var polygon = 'POLYGON((';
           $.each(mpoly._latlngs, function(i, c){
             polygon += c.lng + ' ' + c.lat + ', '
           })
-          polygon += mpoly._latlngs[0].lng + ' ' + mpoly._latlngs[0].lat + ')))';
+          polygon += mpoly._latlngs[0].lng + ' ' + mpoly._latlngs[0].lat + '))';
           ship(polygon)
         // }
       });
