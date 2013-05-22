@@ -16,6 +16,12 @@
         padding: 20px 0 20px 0;
         font-size: 44px;
       }
+      #header span{
+        position: relative;
+        float: right;
+        margin-right: 20px;
+        font-size: 18px;
+      }
       #map {
         height: 400px;
         padding: 0;
@@ -46,12 +52,12 @@
   </head>
     
   <body>
-
-    <div id="header">What <i>is</i> Minneapolis?</div>
+    <div id="header">What <i>is</i> Minneapolis?  <span><a href="index.html">see latest</a></span></div>
     <div id="map"></div>
     <button id="save">save</button>
     <div id="footer">
       Edit the polygon for <i>Minneapolis</i> to the shape you think it should be. Save it. Then share the URL with others to modify further.
+    </div>
   </body>
 
   <!-- include cartodb.js library -->
