@@ -41,12 +41,6 @@
 
     function main() {
       var width = 540;
-      var video = document.createElement('video');
-          video.src = 'http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4';
-          $('#video').append(video);
-          video.width = width;
-          video.autoplay = true;
-          
       var lastS = 0; 
       var timecheck = function(){
         var curtime = Math.floor(video.currentTime);
@@ -56,7 +50,12 @@
         }
         requestAnimationFrame(timecheck);
       }
-      requestAnimationFrame(timecheck);
+      var video = document.createElement('video');
+          video.src = 'http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4';
+          $('#video').append(video);
+          video.width = width;
+          video.autoplay = true;
+
 
       var user = 'island';
       var table = 'video_tour';
@@ -68,33 +67,27 @@
         center: [44.9910709235921, -93.26337005615234],
         zoom: 9
       })
+
       var lastView;
       var checkMove = function(curtime){
         cdb_json.execute('SELECT cartodb_id FROM '+table+' WHERE seconds < ' + curtime + ' ORDER BY seconds DESC LIMIT 1').done(function(json) {
             if(json.rows.length > 0){
               if (json.rows[0].cartodb_id != lastView){
-                console.log(lastView)
                 cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
                     map.fitBounds(bounds)
-                    console.log(bounds);
                 });
                 lastView = json.rows[0].cartodb_id;
               }
             }
         });
       }
-      // var user = 'viz2';
-      // var table = 'minneapolis';
-      // var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
 
       L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
         attribution: 'Stamen'
       }).addTo(map);
 
-      // var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
-
-      // cdb_geojson.execute('').done(function(geojson) {
-      // });
+      requestAnimationFrame(timecheck);
 
     }
     window.onload = main;
