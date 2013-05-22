@@ -5,20 +5,37 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     
     <style>
-      html, body, #map {
+      html, body {
         height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #header {
+        width: 90%;
+        margin-left: 10%;
+        padding: 20px 0 20px 0;
+        font-size: 44px;
+      }
+      #map {
+        height: 400px;
         padding: 0;
         margin: 0;
       }
       #save {
         position: absolute;
-        top: 10px;
+        top: 95px;
         right: 20px;
         height: 40px;
         width: 80px;
         z-index:1000;
         font-weight: bold;
         font-size: 22px;
+      }
+      #footer {
+        width: 80%;
+        margin: 0 10% 0 10%;
+        padding: 20px 0 20px 0;
+        font-size: 14px;
       }
     </style>
 
@@ -29,8 +46,12 @@
   </head>
     
   <body>
+
+    <div id="header">What <i>is</i> Minneapolis?</div>
     <div id="map"></div>
     <button id="save">save</button>
+    <div id="footer">
+      Edit the polygon for <i>Minneapolis</i> to the shape you think it should be. Save it. Then share the URL with others to modify further.
   </body>
 
   <!-- include cartodb.js library -->
