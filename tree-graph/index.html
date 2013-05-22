@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+      html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #header {
+        width: 90%;
+        margin-left: 10%;
+        padding: 20px 0 20px 0;
+        font-size: 44px;
+      }
+      #header span{
+        position: relative;
+        float: right;
+        margin-right: 20px;
+        font-size: 18px;
+      }
+      #map {
+        height: 400px;
+        padding: 0;
+        margin: 0;
+      }
+
+      svg {
+        width: 100%;
+        height: 500px;
+      }
+      #save {
+        position: absolute;
+        top: 95px;
+        right: 20px;
+        height: 40px;
+        width: 80px;
+        z-index:1000;
+        font-weight: bold;
+        font-size: 22px;
+      }
+      #footer {
+        width: 80%;
+        margin: 0 10% 0 10%;
+        padding: 20px 0 20px 0;
+        font-size: 14px;
+      }
+      .node circle {
+        cursor: pointer;
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+      }
+
+      .node text {
+        font-size: 11px;
+      }
+
+      path.link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 1.5px;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+    
+  <body>
+    <div id="header">What <i>is</i> Minneapolis?  <span><a href="index.html">see latest</a></span></div>
+    <div id="map"></div>
+    <button id="save">save</button>
+    <div id="footer">
+      Edit the polygon for <i>Minneapolis</i> to the shape you think it should be. Save it. Then share the URL with others to modify further.
+    </div>
+  </body>
+
+  <!-- include cartodb.js library -->
+  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+
+    function main() {
+      var id;
+      var map = L.map('map', { 
+        zoomControl: true,
+        center: [44.9910709235921, -93.26337005615234],
+        zoom: 9
+      })
+
+      var user = 'viz2';
+      var table = 'minneapolis';
+      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
+      L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+        attribution: 'Stamen'
+      }).addTo(map);
+
+      var mpoly;
+
+      var ship = function(poly){
+        //Function uses our security definer query to insert data using a GET request
+        var statement = "SELECT AXH_NewMinneapolis("+id+",ST_SetSRID(ST_GeomFromText('"+poly+"'),4326)) id";
+        cdb_json.execute(statement).done(function(json){
+          console.log(json)
+          //set new identifier
+          document.location.hash = json.rows[0].id;
+        }).error(function(){
+          //sorry your polygon is ugly
+        })
+      }
+
+      $("#save").click(function(){
+        // if (mpoly.edited){
+          var polygon = 'MULTIPOLYGON(((';
+          $.each(mpoly._latlngs, function(i, c){
+            polygon += c.lng + ' ' + c.lat + ', '
+          })
+          polygon += mpoly._latlngs[0].lng + ' ' + mpoly._latlngs[0].lat + ')))';
+          ship(polygon)
+        // }
+      });
+
+      var query;
+      var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+      if(window.location.hash.substring(1)){
+        id = window.location.hash.substring(1)
+        query = "SELECT cartodb_id, (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT cartodb_id, the_geom FROM "+table+" WHERE cartodb_id = "+id+") a";
+      } else {
+        query = "SELECT cartodb_id, (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT cartodb_id, the_geom FROM "+table+" ORDER BY cartodb_id DESC LIMIT 1) a";
+      }
+      cdb_geojson.execute(query).done(function(geojson) {
+        id = geojson.features[0].properties.cartodb_id;
+        var polygon = [];
+        $.each(geojson.features, function(i,f){
+          polygon.push([f.geometry.coordinates[1],f.geometry.coordinates[0]])
+        });
+        mpoly = new L.Polygon(polygon);
+
+        mpoly.editing.enable();
+        map.addLayer(mpoly);
+
+      });
+
+      var width = 960, height = 500;
+      var color = d3.scale.category20();
+      var svg = d3.select("body").append("svg")
+          .attr("width", width)
+          .attr("height", height);
+      var force = d3.layout.force() 
+          .charge(-120)
+          .linkDistance(30)
+          .size([width, height]);
+      cdb_json.execute("SELECT cartodb_id c, parent_id FROM "+table+"").done(function(json) {
+        var data = json.rows;
+        // console.log(data)
+        var nodes = [];
+        var edges = [];
+        var nodes = $.map(d3.range(data.length), function(d){return {"name": d};});
+
+        for (var k = 0; k < data.length; k++) {
+          // console.log(k)
+            // nodes.push({name: data[k].c, size: 10, value: 10, id: data[k].c});
+            // console.log(data[k].cartodb_id, data[k].parent_id)
+            if (data[k].parent_id){
+              var edge = {source: data[k].c, size: 10, value: 10, target: data[k].parent_id};
+            } else { 
+              // console.log(data[k].parent_id)
+              var edge = {source: data[k].c, value: 10, target: data[k].c, origin: k};
+            }
+            edges.push(edge);
+                 
+        }
+        // console.log(nodes)
+        // console.log(edges)
+        // nodes = $.map(d3.range(100), function(d){return {"name": d};});
+        // edges = $.map(my_data, function(d){return {"source": d.authorA, "target": d.authorB, "value":d.paperCount, "origin": d};});
+        force
+           .nodes(nodes)
+           .links(edges)
+            // .start();
+
+  var link = svg.selectAll(".link")
+      .data(edges)
+      .enter().append("line")
+      .attr("class", "link")
+
+  var node = svg.selectAll(".node")
+      .data(nodes)
+    .enter().append("circle")
+      .attr("class", "node")
+      .attr("r", 5)
+      .style("fill", function(d) { return "red"; })
+      .call(force.drag);
+        force.start();
+
+      });
+
+    }
+    window.onload = main;
+  </script>
+
+
+</html>
