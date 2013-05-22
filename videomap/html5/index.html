@@ -81,9 +81,9 @@
         }
         requestAnimationFrame(timecheck);
       }
-
-      document.getElementById('vid').innerHTML = '<source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type="video/mp4" />';
-      document.getElementById('vid').load();
+      var video = document.getElementById('vid');
+      video.innerHTML = '<source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type="video/mp4" />';
+      video.load();
 
       var user = 'island';
       var table = 'video_tour';
