@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+      html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #map {
+        width: 540px;
+        height: 300px;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+    
+  <body>
+    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1&amp;player_id=player_1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe>
+    <div id="map"></div>
+  </body>
+
+  <!-- include cartodb.js library -->
+  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+  <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
+  <script>
+
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    window.requestAnimationFrame = requestAnimationFrame;
+
+    function ready(player_id) {
+        // Keep a reference to Froogaloop for this player
+        var container = document.getElementById(player_id).parentNode.parentNode,
+            froogaloop = $f(player_id);
+
+        var timecheck = function(){
+          froogaloop.api('getCurrentTime', function (value, player_id) {
+              // Log out the value in the API Console
+              // console.log(value)
+              //apiLog('getCurrentTime : ' + value);
+              requestAnimationFrame(timecheck);
+          });
+        }
+
+      requestAnimationFrame(timecheck);
+    }
+    function main() {
+      // var id;
+      // var map = L.map('map', { 
+      //   zoomControl: true,
+      //   center: [44.9910709235921, -93.26337005615234],
+      //   zoom: 9
+      // })
+
+      // var user = 'viz2';
+      // var table = 'minneapolis';
+      // var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
+      // L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+      //   attribution: 'Stamen'
+      // }).addTo(map);
+
+      // var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+
+      // cdb_geojson.execute('').done(function(geojson) {
+      // });
+
+      var player = document.querySelectorAll('iframe')[0];
+      $f(player).addEvent('ready', ready);
+    }
+    window.onload = main;
+  </script>
+
+
+</html>

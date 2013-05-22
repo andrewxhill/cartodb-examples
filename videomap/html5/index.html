@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+      html, body {
+        width: 540px;
+        height: 300px;
+        padding: 0;
+        margin: 0;
+      }
+      #map , #video {
+        width: 540px;
+        height: 300px;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+    
+  <body>
+    <div id="video"></div>
+    <div id="map"></div>
+  </body>
+
+  <!-- include cartodb.js library -->
+  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
+  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+  <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
+  <script>
+
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+    window.requestAnimationFrame = requestAnimationFrame;
+
+
+    function ready(player_id) {
+        // Keep a reference to Froogaloop for this player
+        var container = document.getElementById(player_id).parentNode.parentNode,
+            froogaloop = $f(player_id);
+
+        var timecheck = function(){
+          froogaloop.api('getCurrentTime', function (value, player_id) {
+              // Log out the value in the API Console
+              // console.log(value)
+              //apiLog('getCurrentTime : ' + value);
+              requestAnimationFrame(timecheck);
+          });
+        }
+
+      requestAnimationFrame(timecheck);
+    }
+    function main() {
+      var width = 540;
+      var video = document.createElement('video');
+          video.src = 'http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4';
+          $('#video').append(video);
+          video.width = width;
+          video.autoplay = true;
+      var lastS = 0; 
+      var timecheck = function(){
+        var curtime = Math.floor(video.currentTime);
+        if (curtime > lastS){
+          checkMove(curtime);
+          lastS = curtime;
+        }
+        requestAnimationFrame(timecheck);
+      }
+      requestAnimationFrame(timecheck);
+
+      var user = 'island';
+      var table = 'video_tour';
+      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
+      var id;
+      var map = L.map('map', { 
+        zoomControl: true,
+        center: [44.9910709235921, -93.26337005615234],
+        zoom: 9
+      })
+      var lastView;
+      var checkMove = function(curtime){
+        cdb_json.execute('SELECT cartodb_id FROM '+table+' WHERE seconds < ' + curtime + ' ORDER BY seconds DESC LIMIT 1').done(function(json) {
+            if(json.rows.length > 0){
+              if (json.rows[0].cartodb_id != lastView){
+                console.log(lastView)
+                cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
+                    map.fitBounds(bounds)
+                    console.log(bounds);
+                });
+                lastView = json.rows[0].cartodb_id;
+              }
+            }
+        });
+      }
+      // var user = 'viz2';
+      // var table = 'minneapolis';
+      // var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
+      L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+        attribution: 'Stamen'
+      }).addTo(map);
+
+      // var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+
+      // cdb_geojson.execute('').done(function(geojson) {
+      // });
+
+    }
+    window.onload = main;
+  </script>
+
+
+</html>
