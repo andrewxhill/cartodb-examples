@@ -43,12 +43,12 @@
       var id;
       var map = L.map('map', { 
         zoomControl: true,
-        center: [40.9910709235921, -93.26337005615234],
-        zoom: 5
+        center: [44.9910709235921, -93.26337005615234],
+        zoom: 10
       })
 
       var user = 'viz2';
-      var table = 'midwest';
+      var table = 'minneapolis';
       var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
 
       L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
@@ -59,7 +59,7 @@
 
       var ship = function(poly){
         //Function uses our security definer query to insert data using a GET request
-        var statement = "SELECT AXH_NewMidwest("+id+",ST_SetSRID(ST_GeomFromText('"+poly+"'),4326)) id";
+        var statement = "SELECT AXH_NewMinneapolis("+id+",ST_SetSRID(ST_GeomFromText('"+poly+"'),4326)) id";
         cdb_json.execute(statement).done(function(json){
           console.log(json)
           //set new identifier
