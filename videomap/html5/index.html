@@ -6,16 +6,32 @@
     
     <style>
       html, body {
-        width: 540px;
-        height: 300px;
         padding: 0;
         margin: 0;
+      }
+      #container {
+        position: relative;
+        width: 100%;
+        margin-left: 50%;
+      }
+      #header, #footer {
+        background: dodgerblue;
+        position: relative;
+        width: 500px;
+        margin-left: 10%;
+        padding: 20px;
+        margin-left: -270px;
+      }
+      #header{
+        font-size: 44px;
+        background: dodgerblue;
       }
       #map , #video {
         width: 540px;
         height: 300px;
         padding: 0;
         margin: 0;
+        margin-left: -270px;
       }
     </style>
 
@@ -26,8 +42,16 @@
   </head>
     
   <body>
-    <div id="video"></div>
-    <div id="map"></div>
+    <div id="container">
+      <div id="header">Map tour based on a playing video</div>
+      <div id="video"></div>
+      <div id="map"></div>
+      <div id="footer">
+        Requires HTML5
+        <br/>
+        For tour data, see the <a href="https://island.cartodb.com/tables/30565/#/table">cartodb table</a>
+      </div>
+    </div>
   </body>
 
   <!-- include cartodb.js library -->
@@ -55,6 +79,8 @@
           $('#video').append(video);
           video.width = width;
           video.autoplay = true;
+          video.preload="auto"
+          video.controls= true;
 
 
       var user = 'island';
@@ -86,6 +112,14 @@
       L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
         attribution: 'Stamen'
       }).addTo(map);
+
+
+      cartodb.createLayer(map, "http://"+user+".cartodb.com/api/v1/viz/"+table+"/viz.json")
+       .on('done', function(layer) {
+          map.addLayer(layer);
+      }).on('error', function() {
+        cartodb.log.log("some error occurred");
+      });
 
       requestAnimationFrame(timecheck);
 
