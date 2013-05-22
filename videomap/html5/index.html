@@ -45,7 +45,13 @@
   <body>
     <div id="container">
       <div id="header">Map tour based on a playing video</div>
-      <div id="video"></div>
+      <div id="video">
+        <video autoplay=true width="540px" controls>
+         <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type='video/ogg; codecs="theora, vorbis"'>
+         <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+         video not supported
+        </video>
+      </div>
       <div id="map"></div>
       <div id="footer">
         Requires HTML5
@@ -75,14 +81,6 @@
         }
         requestAnimationFrame(timecheck);
       }
-      var video = document.createElement('video');
-          video.type="video/mp4"
-          video.src = 'http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4';
-          $('#video').append(video);
-          video.width = width;
-          video.autoplay = true;
-          video.preload="auto"
-          video.controls= true;
 
 
       var user = 'island';
