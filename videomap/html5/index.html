@@ -34,29 +34,11 @@
   <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
   <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
   <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
-  <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
   <script>
 
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
 
-
-    function ready(player_id) {
-        // Keep a reference to Froogaloop for this player
-        var container = document.getElementById(player_id).parentNode.parentNode,
-            froogaloop = $f(player_id);
-
-        var timecheck = function(){
-          froogaloop.api('getCurrentTime', function (value, player_id) {
-              // Log out the value in the API Console
-              // console.log(value)
-              //apiLog('getCurrentTime : ' + value);
-              requestAnimationFrame(timecheck);
-          });
-        }
-
-      requestAnimationFrame(timecheck);
-    }
     function main() {
       var width = 540;
       var video = document.createElement('video');
