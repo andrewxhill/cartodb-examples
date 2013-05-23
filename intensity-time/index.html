@@ -69,7 +69,7 @@
       var path = d3.geo.path()
                   .projection(xy)
 
-      var colors = ["#FFFFFF", "#fdfdfd", "#6ab9fa", "#39a2f8", "#098bf5"];
+      var colors = ["#FFFFFF", "#FEF0D9", "#fDCC8A", "#FC8D59", "#D7301F"];
 
       var fill = d3.scale.linear()
           .domain([0, 1, 5, 25, 100])
@@ -111,13 +111,13 @@
             .transition().duration(2)
             .attr("fill", function(d){ 
               // console.log(fill(vals[d.properties.iso])); 
-              return fill(vals[d.properties.iso])})
+              return fill(Math.floor(vals[d.properties.iso]))})
       }
       var iterateDays = function(){
         var d = ('0' + curdate.getDay()).slice(-2)+'/'+('0' + (curdate.getMonth()+1)).slice(-2)+'/'+curdate.getFullYear();
         // console.log(d)
         for (i in vals){
-          if (vals[i]>=1) vals[i]--;
+          if (vals[i]>=0) vals[i] = vals[i] - 0.1;
         }
         if (d in damage){
           for (s in damage[d]){
