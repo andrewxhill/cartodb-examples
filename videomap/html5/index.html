@@ -67,8 +67,6 @@
   </body>
 
   <!-- include cartodb.js library -->
-  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
-  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
   <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
   <script>
 
@@ -99,16 +97,38 @@
         zoomControl: true,
         center: [10,10],
         zoom: 1
-      })
+      });
 
+      var pointtour = function(){
+        var stop = tourstops.shift();
+        map.panTo([stop.lat, stop.lng]);
+        if (tourstops.length >0) {
+          setTimeout(pointtour,tourdelay);
+        }else{
+          map.setZoom(12);
+        }
+      }
       var lastView;
+      var tourstops; 
+      var tourdelay;
       var checkMove = function(curtime){
-        cdb_json.execute('SELECT cartodb_id FROM '+table+' WHERE seconds < ' + curtime + ' ORDER BY seconds DESC LIMIT 1').done(function(json) {
+        cdb_json.execute('SELECT cartodb_id, type, duration FROM '+table+' WHERE start_second < ' + curtime + ' ORDER BY start_second DESC LIMIT 1').done(function(json) {
             if(json.rows.length > 0){
               if (json.rows[0].cartodb_id != lastView){
-                cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
+
+                if ( json.rows[0].type == 'bbox') {
+                  cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
                     map.fitBounds(bounds)
-                });
+                  });
+                }
+                if ( json.rows[0].type == 'tour') {
+                  cdb_json.execute('WITH geoms AS (SELECT (st_dumppoints(st_geometryn(the_geom,1))).geom FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+') SELECT st_x(geom) lng, st_y(geom) lat FROM geoms').done(function(data) {
+                      map.setZoom(9);
+                      tourstops = data.rows;
+                      tourdelay = 1000*json.rows[0].duration / data.rows.length;
+                      pointtour()
+                  });
+                }
                 lastView = json.rows[0].cartodb_id;
               }
             }
