@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+    html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background:white;
+    }
+    svg {
+      width: 960px;
+      height: 500px;
+      background: none;
+    }
+    svg:active {
+      cursor: move;
+      cursor: -moz-grabbing;
+      cursor: -webkit-grabbing;
+    }
+    #first_layer path {
+      stroke: #000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #clock {
+      position: absolute;
+      z-index: 1000;
+      width: 100px; height: 30px;
+      font-size: 24;
+      color: black;
+      top: 20px;
+      right: 10px;
+    }
+    </style>
+  </head>
+    
+  <body>
+    <div id="clock"></div>
+  </body>
+
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+  <script>
+
+    function main() {
+      var alldata;
+      var startd = '1950-01-01';
+      var start = new Date(startd);
+      var curdate = start;
+        $('#clock').text(curdate)
+
+      var svg = d3.select("body")
+                  .append("svg")
+                  // .call(d3.behavior.zoom()
+                  //     .on("zoom", redraw))
+                  // .append("g");
+
+
+      // Our projection.
+      var xy = d3.geo.mercator()
+                .scale(900)
+                .center([-95,40]);
+
+      var path = d3.geo.path()
+                  .projection(xy)
+
+      var colors = ["#FFFFFF", "#fdfdfd", "#6ab9fa", "#39a2f8", "#098bf5"];
+
+      var fill = d3.scale.linear()
+          .domain([0, 1, 5, 25, 100])
+          .range(colors);
+
+
+      svg.append("g").attr("id", "first_layer");
+
+      d3.json("http://osm2.cartodb.com/api/v2/sql?q=SELECT the_geom, iso, 0 as damage FROM us_states WHERE the_geom IS NOT NULL&format=geojson&dp=5", function(geojson) {
+      //var subunits = topojson.object(collection);
+      // var tj = {countries: {type: "GeometryCollection", geometries: []}};
+      // for (i in collection.objects){
+      //   tj.countries.geometries.push(collection.objects[i])
+      // }
+      // collection.objects = tj
+      var idx = {};
+      var vals = {};
+      for (var i = 0; i<geojson.features.length; ++i){
+        idx[geojson.features[i].properties.iso] = i;
+        vals[geojson.features[i].properties.iso] = 0;
+      }
+
+      var chart = svg.select("#first_layer")
+        
+      var g = chart.selectAll("path")
+          .data(geojson.features)
+        .enter().append("path")
+        .attr("class", function(d){ return d.iso })
+        .attr("fill", function(d){ return fill(vals[d.properties.iso])})
+        .attr("stroke-width", "0.5px")
+        .attr("fill-opacity", "0.7")
+        .attr("d", path.projection(xy));
+
+      var damage;
+      var render = function(){
+        // console.log('rend')
+        g
+          .data(geojson.features)
+            .transition().duration(2)
+            .attr("fill", function(d){ 
+              // console.log(fill(vals[d.properties.iso])); 
+              return fill(vals[d.properties.iso])})
+      }
+      var iterateDays = function(){
+        var d = ('0' + curdate.getDay()).slice(-2)+'/'+('0' + (curdate.getMonth()+1)).slice(-2)+'/'+curdate.getFullYear();
+        // console.log(d)
+        for (i in vals){
+          if (vals[i]>=1) vals[i]--;
+        }
+        if (d in damage){
+          for (s in damage[d]){
+            var val = damage[d][s]
+            vals[s] += val;
+          }
+        }
+        curdate.setDate( curdate.getDate() + 1 );
+        render();
+        $('#clock').text(d);
+        if (curdate <= Date.now()) setTimeout(iterateDays, 4);
+      }
+      d3.json("http://osm2.cartodb.com/api/v2/sql?q=SELECT damage,date,injuries,size,state FROM table_1950_2012", function(json) {
+        var data = json.rows;
+        damage = {};
+        for(var i = 0; i<data.length; ++i){
+          if(!(data[i].date in damage)) damage[data[i].date] = {};
+          if(!(data[i].state in damage[data[i].date])) damage[data[i].date][data[i].state] = data[i].damage + 1;
+        }
+        // if ('06/01/1992' in damage) console.log( damage['06/01/1992']);
+
+        iterateDays();
+    //   sql.execute("WITH extents AS (SELECT max({{date_col}}) mx, min({{date_col}}) mn FROM {{table_name}} WHERE the_geom IS NOT NULL) SELECT count(*) count, mn + i*(mx - mn)/{{steps}} frame FROM {{table_name}}, extents, GENERATE_SERIES(1,{{steps}}) i  WHERE mn + (i-1)*(mx - mn)/{{steps}} < {{date_col}} AND {{date_col}} < mn + (i)*(mx - mn)/{{steps}} GROUP BY mn + i*(mx - mn)/{{steps}} ORDER BY mn + i*(mx - mn)/{{steps}}  ASC", {table_name: table_name, date_col: date_col, steps: steps})
+    // .error(function(e){ })
+    // .done(function(data){
+    //     var m = 20;
+    //     var w = $('#slider-container').width();
+    //     var h = $('#slider-container').height()-2*m;
+    //     data = data.rows;
+
+    //     var mxX = new Date(data[data.length-1].frame); var mnX = new Date(data[0].frame);
+    //     var mxY = data[0].count, mnY = data[0].count;
+
+    //     $.each(data,function(i,d){
+    //         if (d.count < mnY) mnY = d.count;
+    //         if (mxY < d.count) mxY = d.count;
+    //     })
+
+    //     var x = d3.scale.linear().domain([mnX, mxX]).range([0, w - 2*wm ]);
+    //     // var x = d3.scale.linear().domain([0, data.length]).range([0, w - 2*wm ]);
+    //     var y = d3.scale.linear().domain([mnY, mxY]).range([h, 0]);
+
+    //     var line = d3.svg.line()
+
+    //     .x(function(d,i) { 
+    //         return x(new Date(d.frame)); 
+    //     })
+    //     .y(function(d) { 
+    //         return y(d.count); 
+    //     })
+
+    //     // Add an SVG element with the desired dimensions and margin.
+    //     var graph = d3.select("#graph").append("svg:svg")
+    //           .attr("width", w - 2*wm)
+    //           .attr("height", h + m)
+    //         .append("svg:g");
+
+    //     graph.selectAll(".xLabel")
+    //         .data(x.ticks(10))
+    //         .enter().append("svg:text")
+    //         .attr("class", "xLabel")
+    //         .text(function(i, d) {  
+    //             // if (d==0) {return null} 
+    //             if (date_format == 'time'){
+    //                 return new Date(i).toTimeString().split(' ')[0];
+    //             }
+    //             else if (date_format == 'year') {
+    //                 return new Date(i).getFullYear();
+    //             }
+    //             else {
+    //                 var d = new Date(i).toDateString().split(' ');
+    //                 return d.slice(1, 4).join(' ')
+    //             }
+    //         })
+    //         .attr("x", function(d) { return x(new Date(d)) })
+    //         .attr("y", h+18)
+    //         .attr("text-anchor", "middle")
+      //   graph.append("svg:path").attr("d", line(data));
+      // })
+        })
+
+      });
+    }
+    window.onload = main;
+  </script>
+
+
+</html>
