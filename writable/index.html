@@ -70,47 +70,54 @@
 
     function main() {
       var id;
+
+      // Initiate slippy map
       var map = L.map('map', { 
         zoomControl: true,
         center: [44.9910709235921, -93.26337005615234],
         zoom: 9
       })
 
-      var user = 'viz2';
-      var table = 'minneapolis';
-      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
-
+      // Add a basemap
       L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
         attribution: 'Stamen'
       }).addTo(map);
 
-      var mpoly;
+      // Setup the CartoDB.js SQL API client
+      var user = 'viz2';
+      var table = 'minneapolis';
+      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+      // For ease, I create two versions, one that will return JSON the second that returns GeoJSON
+      var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
 
+      // Function to run our named function SQL via the SQL API
+      var mpoly;
       var ship = function(poly){
-        //Function uses our security definer query to insert data using a GET request
+        // AXH_NewMinneapolis is a custom function
         var statement = "SELECT AXH_NewMinneapolis("+id+",ST_SetSRID(ST_Multi(ST_GeomFromText('"+poly+"')),4326)) id";
         cdb_json.execute(statement).done(function(json){
           console.log(json)
-          //set new identifier
+          // Set new identifier in the URL
           document.location.hash = json.rows[0].id;
-        }).error(function(){
-          //sorry your polygon is ugly
         })
       }
 
+      // Event for Saving the edited polygon
       $("#save").click(function(){
-        // if (mpoly.edited){
+        if (mpoly.edited){
+          // Collect the vertices into a WKT polygon
           var polygon = 'POLYGON((';
           $.each(mpoly._latlngs, function(i, c){
             polygon += c.lng + ' ' + c.lat + ', '
           })
           polygon += mpoly._latlngs[0].lng + ' ' + mpoly._latlngs[0].lat + '))';
           ship(polygon)
-        // }
+        }
       });
 
       var query;
-      var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+
+      // Get our latest polygon to start editing
       if(window.location.hash.substring(1)){
         id = window.location.hash.substring(1)
         query = "SELECT cartodb_id, (ST_DumpPoints(the_geom)).geom as the_geom FROM (SELECT cartodb_id, the_geom FROM "+table+" WHERE cartodb_id = "+id+") a";
@@ -123,8 +130,9 @@
         $.each(geojson.features, function(i,f){
           polygon.push([f.geometry.coordinates[1],f.geometry.coordinates[0]])
         });
-        mpoly = new L.Polygon(polygon);
 
+        // Draw, map, and enable editing
+        mpoly = new L.Polygon(polygon);
         mpoly.editing.enable();
         map.addLayer(mpoly);
 
