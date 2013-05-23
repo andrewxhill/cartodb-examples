@@ -48,15 +48,15 @@
       <div id="header">Map tour based on a playing video</div>
 
       <div id="video">
-        
-            <video class="video-js" controls
-              preload="auto" width="620" height="349"  data-setup="{}">
-              <source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.mp4" type="video/mp4">
-              <source src="http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.webm" type="video/webm">
-            </video>
 
-        <!-- <video id="vid" autoplay=true width="540px" controls>
-        </video> -->
+<!--             <video class="video-js" controls
+              preload="auto" autoplay=true width="540px" height="auto"  data-setup="{}">
+                <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type="video/mp4">
+                <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.webm" type="video/webm">
+            </video> -->
+
+        <video id="vid" autoplay=true width="540px" controls>
+        </video>
       </div>
       <div id="map"></div>
       <div id="footer">
@@ -132,7 +132,7 @@
       requestAnimationFrame(timecheck);
 
     }
-    // window.onload = main;
+    window.onload = main;
   </script>
 
 
