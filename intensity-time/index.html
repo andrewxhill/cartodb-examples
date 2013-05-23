@@ -69,10 +69,10 @@
       var path = d3.geo.path()
                   .projection(xy)
 
-      var colors = ["#FFFFFF", "#FEF0D9", "#fDCC8A", "#FC8D59", "#D7301F"];
+      var colors = ["#FFFFFF", "#FEF0D9", "#fDCC8A", "#FC8D59", "#E34A33","#B30000"];
 
       var fill = d3.scale.linear()
-          .domain([0, 1, 5, 25, 100])
+          .domain([0, 1, 4, 16, 64, 256])
           .range(colors);
 
 
