@@ -117,7 +117,7 @@
         var d = ('0' + curdate.getDay()).slice(-2)+'/'+('0' + (curdate.getMonth()+1)).slice(-2)+'/'+curdate.getFullYear();
         // console.log(d)
         for (i in vals){
-          if (vals[i]>=0) vals[i] = vals[i] - 0.25;
+          if (vals[i]>=0) vals[i] = vals[i] * 0.98;
         }
         if (d in damage){
           for (s in damage[d]){
