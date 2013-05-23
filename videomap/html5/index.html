@@ -62,6 +62,8 @@
         Requires HTML5
         <br/>
         For tour data, see the <a href="https://island.cartodb.com/tables/30565/#/table">cartodb table</a>
+        <br/>
+        To get the full-length, head over to the <a href='http://island.io/films'>Island</a>
       </div>
     </div>
   </body>
@@ -76,10 +78,15 @@
     function main() {
       var width = 540;
       var lastS = 0; 
+
       var timecheck = function(){
         var curtime = Math.floor(video.currentTime);
         if (curtime > lastS){
+          if(!(video.seeking)) checkMove(curtime);
+          lastS = curtime;
+        } else if (curtime < lastS - 10){
           checkMove(curtime);
+          lastView = -1;
           lastS = curtime;
         }
         requestAnimationFrame(timecheck);
@@ -102,28 +109,25 @@
       var pointtour = function(){
         var stop = tourstops.shift();
         map.panTo([stop.lat, stop.lng]);
-        if (tourstops.length >0) {
-          setTimeout(pointtour,tourdelay);
-        }else{
-          map.setZoom(12);
+        if (tourstops.length > 0) {
+          if(!(video.seeking)) setTimeout(pointtour,tourdelay);
         }
       }
       var lastView;
       var tourstops; 
       var tourdelay;
       var checkMove = function(curtime){
-        cdb_json.execute('SELECT cartodb_id, type, duration FROM '+table+' WHERE start_second < ' + curtime + ' ORDER BY start_second DESC LIMIT 1').done(function(json) {
+        cdb_json.execute('SELECT cartodb_id, type, duration, zoom FROM '+table+' WHERE start_second < ' + curtime + ' ORDER BY start_second DESC LIMIT 1').done(function(json) {
             if(json.rows.length > 0){
               if (json.rows[0].cartodb_id != lastView){
-
                 if ( json.rows[0].type == 'bbox') {
                   cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
                     map.fitBounds(bounds)
                   });
                 }
-                if ( json.rows[0].type == 'tour') {
+                else if ( json.rows[0].type == 'tour') {
                   cdb_json.execute('WITH geoms AS (SELECT (st_dumppoints(st_geometryn(the_geom,1))).geom FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+') SELECT st_x(geom) lng, st_y(geom) lat FROM geoms').done(function(data) {
-                      map.setZoom(9);
+                      map.setZoom(json.rows[0].zoom);
                       tourstops = data.rows;
                       tourdelay = 1000*json.rows[0].duration / data.rows.length;
                       pointtour()
@@ -141,12 +145,12 @@
       }).addTo(map);
 
 
-      cartodb.createLayer(map, "http://"+user+".cartodb.com/api/v1/viz/"+table+"/viz.json")
-       .on('done', function(layer) {
-          map.addLayer(layer);
-      }).on('error', function() {
-        cartodb.log.log("some error occurred");
-      });
+      // cartodb.createLayer(map, "http://"+user+".cartodb.com/api/v1/viz/"+table+"/viz.json")
+      //  .on('done', function(layer) {
+      //     map.addLayer(layer);
+      // }).on('error', function() {
+      //   cartodb.log.log("some error occurred");
+      // });
 
       requestAnimationFrame(timecheck);
 
