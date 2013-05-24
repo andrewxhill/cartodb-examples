@@ -1,0 +1,238 @@
+<html>
+  <head>
+    <style>
+      html, body {
+        padding: 0; margin: 0; height: 100%;
+        background-color: black;
+      }
+      canvas {
+        background: #346FBE;
+        /*-webkit-transform: perspective(800px) rotateX(40deg);*/
+      }
+      #date {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: white;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="c"></canvas>
+    <div id="date"></div>
+  </body>
+
+  <script src="d3.min.js"></script>
+
+  <script>
+
+    var lpf = 3;
+    try {
+      lpf = window.location.href.match(/lpf=(\d+)/)[1] | 0;
+    } catch(e) {}
+
+
+    // canvas init
+    var canvas = document.getElementById('c');
+    var w = canvas.width = innerWidth;
+    var h = canvas.height = innerHeight;
+    var ctx = canvas.getContext('2d');
+    ctx.translate(w>>1, h>>1);
+
+
+    // mercator with canvas size
+    var projection = d3.geo.mercator()
+      .scale((w+ 1) / 2 / Math.PI)
+      .translate([w/2, h/2])
+      .precision(.001);
+
+      var center = projection(
+      //  [40.40973495735627, -3.681693843701168 ] // madrid
+        [51.511214,  -0.100824] // london
+      );
+    var scale = 700;
+
+    // projects to canvas coordinate system [lat, lon] => [x, y]
+    function _p(point) {
+        point = projection([point[0], point[1]]);
+        return [
+            -scale*(point[1] - center[1]),
+            -scale*(point[0] - center[0])]
+    }
+
+    // transform from 
+    function transform_to_geojson(data) {
+      var features = []
+      var geojson = {
+        features: features
+      };
+      for (var i = 0, len = data.length; i < len; ++i) {
+        var r = data[i];
+        var coords = r.vertex;
+        var activity = r.activity;
+        var grouped_activity = []
+        for(var a = 0; a < activity[0].length; ++a) {
+          grouped_activity[a] = 0.0;
+          for(var aa = 0; aa < activity.length; ++aa) {
+            grouped_activity[a] = activity[aa][a];
+          }
+        }
+        var a = lpf;
+        while(a--) {
+          for(var j = 1; j < grouped_activity.length; ++j) {
+            grouped_activity[j] = (grouped_activity[j] + grouped_activity[j - 1])/2.0;
+          }
+        }
+        for(var a = 0; a < grouped_activity.length; ++a) {
+          grouped_activity[a] = 1 + 3*grouped_activity[a]
+        }
+
+        if(coords && coords.length && grouped_activity && grouped_activity.length ) {
+          features.push({
+            geometry: {
+              coordinates: [
+                coords
+              ]
+            },
+            weight: r.fc,
+            activity: grouped_activity
+          })
+        }
+      }
+      return geojson;
+    }
+
+    //d3.json("roads.json", function(data) {
+    d3.json("roads_oneday_london_14_96_count_2_4.json", function(data) {
+      data = transform_to_geojson(data);
+      for(var i = 0; i < data.features.length; ++i) {
+        var weight = data.features[i].weight;
+        var coords = data.features[i].geometry.coordinates[0];
+
+        for(var c = 0; c < coords.length - 1 ; ++c) {
+          var p0 = _p(coords[c])
+          var p1 = _p(coords[c + 1])
+          var dx = p1[0] - p0[0];
+          var dy = p1[1] - p0[1];
+          var len = Math.sqrt(dx*dx + dy*dy);
+          coords[c].dir = [dx/len, dy/len];
+          coords[c].r = [];
+          coords[c].r = data.features[i].activity;
+        }
+
+        coords[coords.length - 1].dir = [0, 0]
+        coords[coords.length - 1].r = [];
+        coords[coords.length - 1].r = data.features[coords.length - 1].activity;
+
+      }
+      var render = function(coords, DD, tt) {
+        var t = Math.floor(tt);
+        var dt = tt - t;
+        var p0 = _p(coords[0]);
+
+        // interpolate
+        var a = coords[0].r[t];
+        var b = coords[0].r[(t + 1)%coords[0].r.length];
+        var lw = a + dt*(b - a);
+
+        var alpha = lw/100.0;
+        ctx.lineWidth = lw/15
+        //ctx.strokeStyle = 'rgba(0, 49, 100, 0.7)';// ' + alpha + ')';
+        //ctx.strokeStyle = 'rgba(120, 29, 0, 0.9)';
+        //ctx.strokeStyle = 'rgba(120, 29, 0,' + alpha + ')';
+         ctx.strokeStyle = 'rgba(255, 255, 255, '+ alpha + ')';
+        ctx.moveTo(p0[0], p0[1]);
+        for(var cc = 0; cc < coords.length; ++cc) {
+          p0 = _p(coords[cc]);
+          ctx.lineTo(p0[0], p0[1]);
+        }
+
+        /*
+        for(var cc = 0; cc < coords.length*2 - 2; ++cc) {
+          var c = cc;
+          var D = DD;
+          if(cc >= coords.length - 1) {
+            c = 2*coords.length - 2 - c;
+            D = -DD;
+          }
+          var c1 = coords[c];
+          var p1 = _p(c1);
+          var d1 = c1.sdir;
+
+          var C = 5;
+          var pd1 = [c1.dir[1], -c1.dir[0]]
+
+          var p1_a = [
+           p1[0] + D*c1.r[t]*pd1[0],
+           p1[1] + D*c1.r[t]*pd1[1]
+          ]
+
+          ctx.lineTo(p1_a[0], p1_a[1]);
+        }
+        */
+      }
+      var frame = function(fn) { setTimeout(fn, 20); }
+
+      var pause = true;
+      canvas.onclick = function() {
+        pause = !pause;
+      }
+      var controls = {
+        left: false,
+        right: false,
+        fire: false,
+        up: false,
+        down: false
+      };
+      window.addEventListener('keyup', function(e) { key(e, false); });
+      window.addEventListener('keydown', function(e) { key(e, true);});
+      function key(e, w) {
+        if(e.keyCode == 38) {      controls.up= w; }
+        else if(e.keyCode == 40) { controls.down = w; }
+        else if(e.keyCode == 37) { controls.left = w; } 
+        else if(e.keyCode == 39) { controls.right= w; } 
+        else if(e.keyCode == 32) { controls.fire = w; }
+      };
+      var time = document.getElementById('date');
+      var t = 4*3;
+      function loop() {
+        canvas.width = w;
+        ctx.translate(w>>1, h>>1);
+        //ctx.globalCompositeOperation = 'lighter'
+        ctx.lineCap = 'round';
+        for(var i = 0; i < data.features.length; ++i) {
+          var coords = data.features[i].geometry.coordinates[0];
+          ctx.beginPath();
+          render(coords, 0.3, t);
+          //ctx.fill();
+          ctx.stroke();
+        }
+        frame(loop);
+        var date = new Date(t*1000*3600*24/96)
+        time.innerHTML = date.toString();
+
+        var INC = 0.3
+        if(!pause)
+          t+=INC
+        if(controls.left) {
+          t -= INC
+        }
+        if(controls.right) {
+          t += INC
+        }
+      }
+      frame(loop);
+    });
+
+
+    /*
+        */
+
+
+
+
+
+  </script>
+</html>
