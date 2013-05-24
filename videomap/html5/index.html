@@ -122,7 +122,7 @@
               if (json.rows[0].cartodb_id != lastView){
                 if ( json.rows[0].type == 'bbox') {
                   cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
-                    map.fitBounds(bounds)
+                    map.fitBounds(bounds);
                   });
                 }
                 else if ( json.rows[0].type == 'tour') {

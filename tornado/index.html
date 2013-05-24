@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    
+    <style>
+    html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background:white;
+    }
+    svg {
+      width: 960px;
+      height: 500px;
+      background: none;
+    }
+    svg:active {
+      cursor: move;
+      cursor: -moz-grabbing;
+      cursor: -webkit-grabbing;
+    }
+    #first_layer path {
+      fill: #fff;
+      stroke: #000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #clock {
+      position: absolute;
+      z-index: 1000;
+      width: 100px; height: 30px;
+      font-size: 24;
+      color: black;
+      top: 20px;
+      right: 10px;
+    }
+    </style>
+  </head>
+    
+  <body>
+    <div id="clock"></div>
+  </body>
+
+  <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v0.min.js"></script>
+  <script>
+
+    function main() {
+      var alldata;
+      var startd = '1950-01-01';
+      var start = new Date("01/01/1950");
+      var curdate = start;
+      $('#clock').text('01/01/1950')
+
+      var svg = d3.select("body")
+                  .append("svg")
+                  // .call(d3.behavior.zoom()
+                  //     .on("zoom", redraw))
+                  // .append("g");
+
+
+      // Our projection.
+      var xy = d3.geo.mercator()
+                .scale(900)
+                .center([-95,40]);
+
+      var path = d3.geo.path()
+                  .projection(xy)
+
+      var colors = ["#FFFFFF", "#FEF0D9", "#fDCC8A", "#FC8D59", "#E34A33","#B30000"];
+
+      var fill = d3.scale.linear()
+          .domain([0, 1, 4, 16, 64, 256])
+          .range(colors);
+
+
+      svg.append("g").attr("id", "first_layer");
+
+      var query = "http://osm2.cartodb.com/api/v2/sql?q=SELECT starting_latitude slat, starting_longitude slon, ending_latitude elat, ending_longitude elon, date, miles FROM table_1950_2012_t WHERE ending_latitude != 0 ORDER BY to_date(date,'DD/Mn/YYYY') ASC LIMIT 1000 OFFSET ";
+      var tornados = {};
+      var offset = 0;
+      var play = false;
+
+      var run = function(){
+        var d = ('0' + curdate.getDate()).slice(-2)+'/'+('0' + (curdate.getMonth()+1)).slice(-2)+'/'+curdate.getFullYear();
+
+        if (d in tornados){
+          for (s in tornados[d]){
+            var val = tornados[d][s];
+            var start = xy([val[1],val[0]])
+            var end = xy([val[3],val[2]])
+            svg.append("circle")
+                .attr("cx", start[0])
+                .attr("cy", start[1])
+                .attr("r", 1)
+                .style("fill", "red")
+                .style("fill-opacity", 0.5)
+                .style("stroke", "red")
+                .style("stroke-opacity", 0.5)
+            .transition()
+              .duration(1000)
+              .ease(Math.sqrt)
+                .attr("cx", end[0])
+                .attr("cy", end[1])
+                .attr("r", Math.sqrt(val[4]))
+              .remove()
+          }
+          delete tornados[d]
+          ud--;
+        }
+        // console.log(d, ud, tornados)
+        // console.log(d, ud)
+        // return
+        if (ud<111) getTornados();
+        curdate.setDate( curdate.getDate() + 1 );
+        $('#clock').text(d);
+        if (curdate <= Date.now()) setTimeout(run, 1);
+      }
+      var ud = 0;
+      var getTornados = function(){
+        console.log('get')
+        d3.json(query+offset, function(json) {
+          console.log(json.rows.length)
+          for(var i=0;i<json.rows.length;++i){
+            if(!(json.rows[i].date in tornados)) tornados[json.rows[i].date] = [], ud++;
+            tornados[json.rows[i].date].push([
+              json.rows[i].slat,
+              json.rows[i].slon,
+              json.rows[i].elat,
+              json.rows[i].elon,
+              json.rows[i].miles
+            ]);
+          }
+          if (!play) run(), play=true;
+          if (json.rows.length == 0) getTornados = function(){}
+          offset+=1000;
+        });
+      }
+
+      d3.json("http://osm2.cartodb.com/api/v2/sql?q=SELECT the_geom, iso, 0 as damage FROM us_states WHERE the_geom IS NOT NULL&format=geojson&dp=5", function(geojson) {
+
+
+        var chart = svg.select("#first_layer")
+          
+        var g = chart.selectAll("path")
+            .data(geojson.features)
+          .enter().append("path")
+          .attr("class", function(d){ return d.iso })
+          .attr("stroke-width", "0.5px")
+          .attr("fill-opacity", "0.7")
+          .attr("d", path.projection(xy));
+
+        getTornados();
+
+      });
+    }
+    window.onload = main;
+  </script>
+
+
+</html>
