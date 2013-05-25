@@ -48,12 +48,6 @@
 
       <div id="video">
 
-<!--             <video class="video-js" controls
-              preload="auto" autoplay=true width="540px" height="auto"  data-setup="{}">
-                <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.mp4" type="video/mp4">
-                <source src="http://video.islandio.s3.amazonaws.com/8b/fa732ba986970e0e8c7cef03fac2ae.webm" type="video/webm">
-            </video> -->
-
         <video id="vid" autoplay=true width="540px" controls>
         </video>
       </div>
@@ -143,14 +137,6 @@
       L.tileLayer('https://maps.nlp.nokia.com/maptiler/v2/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?lg=eng&token=61YWYROufLu_f8ylE0vn0Q&app_id=qIWDkliFCtLntLma2e6O', {
         attribution: 'Nokia'
       }).addTo(map);
-
-
-      // cartodb.createLayer(map, "http://"+user+".cartodb.com/api/v1/viz/"+table+"/viz.json")
-      //  .on('done', function(layer) {
-      //     map.addLayer(layer);
-      // }).on('error', function() {
-      //   cartodb.log.log("some error occurred");
-      // });
 
       requestAnimationFrame(timecheck);
 

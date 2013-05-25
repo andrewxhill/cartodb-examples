@@ -6,15 +6,33 @@
     
     <style>
       html, body {
-        height: 100%;
+        background: dimgray;
         padding: 0;
         margin: 0;
       }
-      #map {
+      #container {
+        position: relative;
+        width: 100%;
+        margin-left: 50%;
+      }
+      #header, #footer {
+        background: dodgerblue;
+        position: relative;
+        width: 500px;
+        margin-left: 10%;
+        padding: 20px;
+        margin-left: -270px;
+      }
+      #header{
+        font-size: 44px;
+        background: dodgerblue;
+      }
+      #map , #video {
         width: 540px;
         height: 300px;
         padding: 0;
         margin: 0;
+        margin-left: -270px;
       }
     </style>
 
@@ -25,59 +43,110 @@
   </head>
     
   <body>
-    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1&amp;player_id=player_1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe>
-    <div id="map"></div>
+    <div id="container">
+      <div id="header">Map tour based on a playing video</div>
+
+      <div id="video">
+        <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1&amp;player_id=player_1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe>
+      </div>
+      <div id="map"></div>
+      <div id="footer">
+        Requires HTML5
+        <br/>
+        For tour data, see the <a href="https://island.cartodb.com/tables/30565/#/table">cartodb table</a>
+        <br/>
+        To get the full-length, head over to the <a href='http://island.io/films'>Island</a>
+      </div>
+    </div>
   </body>
 
   <!-- include cartodb.js library -->
-  <script src="http://leaflet.github.io/Leaflet.draw/lib/leaflet/leaflet.js"></script>
-  <script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
   <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
-  <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
   <script>
 
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
 
-    function ready(player_id) {
-        // Keep a reference to Froogaloop for this player
-        var container = document.getElementById(player_id).parentNode.parentNode,
-            froogaloop = $f(player_id);
-
-        var timecheck = function(){
-          froogaloop.api('getCurrentTime', function (value, player_id) {
-              // Log out the value in the API Console
-              // console.log(value)
-              //apiLog('getCurrentTime : ' + value);
-              requestAnimationFrame(timecheck);
-          });
-        }
-
-      requestAnimationFrame(timecheck);
-    }
     function main() {
-      // var id;
-      // var map = L.map('map', { 
-      //   zoomControl: true,
-      //   center: [44.9910709235921, -93.26337005615234],
-      //   zoom: 9
-      // })
+      var width = 540;
+      var lastS = 0; 
+      var froogaloop;
 
-      // var user = 'viz2';
-      // var table = 'minneapolis';
-      // var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+      var ready = function(player_id){
+        // var container = document.getElementById(player_id).parentNode.parentNode,
+        froogaloop = $f(player_id);
+      }
+      var timecheck = function(){
+        
 
-      // L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
-      //   attribution: 'Stamen'
-      // }).addTo(map);
+        froogaloop.api('getCurrentTime', function (value, player_id) {
+            var curtime = Math.floor(value.currentTime);
 
-      // var cdb_geojson = new cartodb.SQL({ user: user, format: 'geojson' });
+            if (curtime > lastS){
+              // if(!(video.seeking)) checkMove(curtime);
+              lastS = curtime;
+            } else if (curtime < lastS - 10){
+              // checkMove(curtime);
+              lastView = -1;
+              lastS = curtime;
+            }
+            requestAnimationFrame(timecheck);
+        });
+      }
 
-      // cdb_geojson.execute('').done(function(geojson) {
-      // });
+
+      var user = 'island';
+      var table = 'video_tour';
+      var cdb_json = new cartodb.SQL({ user: user, format: 'json' });
+
+      var id;
+      var map = L.map('map', { 
+        zoomControl: true,
+        center: [10,10],
+        zoom: 1
+      });
+
+      var pointtour = function(){
+        var stop = tourstops.shift();
+        map.panTo([stop.lat, stop.lng]);
+        if (tourstops.length > 0) {
+          if(!(video.seeking)) setTimeout(pointtour,tourdelay);
+        }
+      }
+      var lastView;
+      var tourstops; 
+      var tourdelay;
+      var checkMove = function(curtime){
+        cdb_json.execute('SELECT cartodb_id, type, duration, zoom FROM '+table+' WHERE start_second < ' + curtime + ' ORDER BY start_second DESC LIMIT 1').done(function(json) {
+            if(json.rows.length > 0){
+              if (json.rows[0].cartodb_id != lastView){
+                if ( json.rows[0].type == 'bbox') {
+                  cdb_json.getBounds('SELECT * FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+' LIMIT 1').done(function(bounds) {
+                    map.fitBounds(bounds);
+                  });
+                }
+                else if ( json.rows[0].type == 'tour') {
+                  cdb_json.execute('WITH geoms AS (SELECT (st_dumppoints(st_geometryn(the_geom,1))).geom FROM '+table+' WHERE cartodb_id = '+json.rows[0].cartodb_id+') SELECT st_x(geom) lng, st_y(geom) lat FROM geoms').done(function(data) {
+                      map.setZoom(json.rows[0].zoom);
+                      tourstops = data.rows;
+                      tourdelay = 1000*json.rows[0].duration / data.rows.length;
+                      pointtour()
+                  });
+                }
+                lastView = json.rows[0].cartodb_id;
+              }
+            }
+        });
+      }
+
+
+      L.tileLayer('https://maps.nlp.nokia.com/maptiler/v2/maptile/newest/normal.day/{z}/{x}/{y}/256/png8?lg=eng&token=61YWYROufLu_f8ylE0vn0Q&app_id=qIWDkliFCtLntLma2e6O', {
+        attribution: 'Nokia'
+      }).addTo(map);
 
       var player = document.querySelectorAll('iframe')[0];
       $f(player).addEvent('ready', ready);
+
     }
     window.onload = main;
   </script>
