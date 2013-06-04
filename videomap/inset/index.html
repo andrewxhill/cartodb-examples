@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Leaflet Video Layer (Mwahaha)</title>
+	<title>Leaflet Video Layer (Mwahaha) </title>
 
 	  <style type='text/css'>
 	    html, body {
@@ -12,7 +12,7 @@
 	      background: white;
 	    }
 	    #map{
-	      height: 90%;
+	      height: 100%;
 	      width: 100%;
 	      background: white;
 	    }
@@ -47,7 +47,11 @@
 
 		map.fitBounds(bounds);
 
-		  var overlay = new L.CanvasOverlay(new L.LatLng(40.77394,-74.22655), {x: 600, y: 400}, {
+    bounds = map.getBounds();
+
+    var width = $('body').width();
+    var height = $('body').height();
+		  var overlay = new L.CanvasOverlay(bounds.getNorthWest(), {x: width, y: height}, {
 			opacity: 0.9
 	  	  });
 		  map.addLayer(overlay);
