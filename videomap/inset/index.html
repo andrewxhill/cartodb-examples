@@ -30,26 +30,8 @@
 <body>
 
 	<div id="map"></div>
-	<button id="populate">Populate with 10 markers</button>
 
 	<script type="text/javascript">
-
-function supportedVideoFormat(video) {
-   var returnExtension = "";
-   if (video.canPlayType("video/webm") =="probably" || 
-       video.canPlayType("video/webm") == "maybe") {
-         returnExtension = "webm";
-   } else if(video.canPlayType("video/mp4") == "probably" || 
-       video.canPlayType("video/mp4") == "maybe") {
-         returnExtension = "mp4";
-   } else if(video.canPlayType("video/ogg") =="probably" || 
-       video.canPlayType("video/ogg") == "maybe") {
-         returnExtension = "ogg";
-   }
-
-   return returnExtension;
-
-}
 
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/d4fc77ea4a63471cab2423e66626cbb6/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
@@ -65,13 +47,6 @@ function supportedVideoFormat(video) {
 
 		map.fitBounds(bounds);
 
-		// console.log(map.getZoomScale(map.getZoom()))
-
-	     //  var canvas = document.getElementById('myCanvas');
-	     //  var context = canvas.getContext('2d');
-
-  		  // context.fillStyle = '#8ED6FF';
-  		  // context.fillRect(50,50,100,100);
 		  var overlay = new L.CanvasOverlay(new L.LatLng(40.77394,-74.22655), {x: 600, y: 400}, {
 			opacity: 0.9
 	  	  });
@@ -88,31 +63,20 @@ var videoDiv;
    document.body.appendChild(videoDiv);
    videoDiv.appendChild(videoElement);
    videoDiv.setAttribute("style", "display:none;");
-   // var videoType = supportedVideoFormat(videoElement);
-   // if (videoType == "") {
-   //    alert("no video support");
-   //    return;
-   // }
-   videoElement.setAttribute("src", "http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.mp4");
-   // videoElement.setAttribute("src", "Rome." + videoType);
+
+   videoElement.setAttribute("src", 'http://kammerl.de/threejs/three.js/examples/textures/kinect.webm');
    videoElement.addEventListener("canplaythrough",videoLoaded,false);
+   videoElement.addEventListener("error",videoLoaded,false);
 
 
 
 function supportedVideoFormat(video) {
    var returnExtension = "";
-   // if (video.canPlayType("video/webm") =="probably" || 
-   //     video.canPlayType("video/webm") == "maybe") {
-   //       returnExtension = "webm";
-   // } else 
+
    if(video.canPlayType("video/mp4") == "probably" || 
        video.canPlayType("video/mp4") == "maybe") {
          returnExtension = "mp4";
    } 
-   // else if(video.canPlayType("video/ogg") =="probably" || 
-   //     video.canPlayType("video/ogg") == "maybe") {
-   //       returnExtension = "ogg";
-   // }
 
    return returnExtension;
 
@@ -129,29 +93,19 @@ function videoLoaded(event) {
 }
 
 function canvasApp() {
-
-   // if (!canvasSupport()) {
-   //        return;
-   //      }
-
 	function  drawScreen () {
-      //Background
+    console.log('d')
       context.fillStyle = '#ffffaa';
       context.fillRect(0, 0, canvas.width, canvas.height);
-      //Box
-      // console.log(canvas.width, canvas.height)n
       context.strokeStyle = '#000000';
-      // context.strokeRect(5,  5, canvas.width−10, canvas.height−10);
-      //video
       context.drawImage(videoElement , 0, 0, canvas.width, canvas.height);
 
    }
 
 		  var context = overlay.getContext();
 		  var canvas = overlay.getCanvas();
-		  // console.log(canvas)
-   // var theCanvas = document.getElementById("canvasOne");
-   // var context = theCanvas.getContext("2d");
+
+   videoElement.loop = true;
    videoElement.play();
 
    setInterval(drawScreen, 33);
