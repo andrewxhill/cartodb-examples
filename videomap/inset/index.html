@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	  <style type='text/css'>
+	    html, body {
+	      margin: 0;
+	      padding: 0;
+	      height: 100%;
+	      width: 100%;
+	      background: white;
+	    }
+	    #map{
+	      height: 90%;
+	      width: 100%;
+	      background: white;
+	    }
+    </style>
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  	<script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+  	<script src="CanvasOverlay.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+	<button id="populate">Populate with 10 markers</button>
+
+	<script type="text/javascript">
+
+function supportedVideoFormat(video) {
+   var returnExtension = "";
+   if (video.canPlayType("video/webm") =="probably" || 
+       video.canPlayType("video/webm") == "maybe") {
+         returnExtension = "webm";
+   } else if(video.canPlayType("video/mp4") == "probably" || 
+       video.canPlayType("video/mp4") == "maybe") {
+         returnExtension = "mp4";
+   } else if(video.canPlayType("video/ogg") =="probably" || 
+       video.canPlayType("video/ogg") == "maybe") {
+         returnExtension = "ogg";
+   }
+
+   return returnExtension;
+
+}
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/d4fc77ea4a63471cab2423e66626cbb6/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(50.5, 30.51);
+
+		var map = new L.Map('map');
+		map.addLayer(cloudmade);
+
+		var	bounds = new L.LatLngBounds(
+      		new L.LatLng(40.71222,-74.22655),
+      		new L.LatLng(40.77394,-74.12544));
+
+		map.fitBounds(bounds);
+
+		// console.log(map.getZoomScale(map.getZoom()))
+
+	     //  var canvas = document.getElementById('myCanvas');
+	     //  var context = canvas.getContext('2d');
+
+  		  // context.fillStyle = '#8ED6FF';
+  		  // context.fillRect(50,50,100,100);
+		  var overlay = new L.CanvasOverlay(new L.LatLng(40.77394,-74.22655), {x: 600, y: 400}, {
+			opacity: 0.9
+	  	  });
+		  map.addLayer(overlay);
+
+
+
+var videoElement;
+var videoDiv;
+
+
+   videoElement = document.createElement("video");
+   videoDiv = document.createElement('div');
+   document.body.appendChild(videoDiv);
+   videoDiv.appendChild(videoElement);
+   videoDiv.setAttribute("style", "display:none;");
+   // var videoType = supportedVideoFormat(videoElement);
+   // if (videoType == "") {
+   //    alert("no video support");
+   //    return;
+   // }
+   videoElement.setAttribute("src", "http://iurevych.github.com/Flat-UI-videos/big_buck_bunny.mp4");
+   // videoElement.setAttribute("src", "Rome." + videoType);
+   videoElement.addEventListener("canplaythrough",videoLoaded,false);
+
+
+
+function supportedVideoFormat(video) {
+   var returnExtension = "";
+   // if (video.canPlayType("video/webm") =="probably" || 
+   //     video.canPlayType("video/webm") == "maybe") {
+   //       returnExtension = "webm";
+   // } else 
+   if(video.canPlayType("video/mp4") == "probably" || 
+       video.canPlayType("video/mp4") == "maybe") {
+         returnExtension = "mp4";
+   } 
+   // else if(video.canPlayType("video/ogg") =="probably" || 
+   //     video.canPlayType("video/ogg") == "maybe") {
+   //       returnExtension = "ogg";
+   // }
+
+   return returnExtension;
+
+}
+
+// function canvasSupport () {
+//      return Modernizr.canvas;
+// }
+
+function videoLoaded(event) {
+
+   canvasApp();
+
+}
+
+function canvasApp() {
+
+   // if (!canvasSupport()) {
+   //        return;
+   //      }
+
+	function  drawScreen () {
+      //Background
+      context.fillStyle = '#ffffaa';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      //Box
+      // console.log(canvas.width, canvas.height)n
+      context.strokeStyle = '#000000';
+      // context.strokeRect(5,  5, canvas.width−10, canvas.height−10);
+      //video
+      context.drawImage(videoElement , 0, 0, canvas.width, canvas.height);
+
+   }
+
+		  var context = overlay.getContext();
+		  var canvas = overlay.getCanvas();
+		  // console.log(canvas)
+   // var theCanvas = document.getElementById("canvasOne");
+   // var context = theCanvas.getContext("2d");
+   videoElement.play();
+
+   setInterval(drawScreen, 33);
+
+}
+
+	      // };
+	      // imageObj.src = 'darth-vader.jpg';
+
+		// var image = new Image();
+		// 	image.src = "https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg";
+		// 	image.onload = function(){
+		// 		console.log(image.src)
+		// 		var overlay = new L.ImageOverlay(canvas, bounds, {
+		// 			opacity: 0.5
+		// 		});
+		// 		map.addLayer(overlay);
+		// 	};
+
+	</script>
+</body>
+</html>
