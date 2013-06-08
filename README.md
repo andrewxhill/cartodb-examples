@@ -24,7 +24,13 @@ This example makes a video's playing timestamp into a control for a map
 
 Quick test to create a Leaflet plugin for a VideoOVerlay object
 
+with canvas,
+
  - [demo](http://andrewxhill.github.io/cartodb-examples/videomap/inset/index.html)
+
+or with Vimeo,
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/videomap/video-inset/index.html)
 
 #### Scrolling stories with CartoDB templates and multiple maps
 
