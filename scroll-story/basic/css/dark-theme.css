@@ -1,0 +1,18 @@
+/* Change the styles below in order to customize your template */
+
+body{font-family: Helvetica, Arial; font-weight: regular; font-size: 15px; color: #CBCBCB; background-color: #333; margin: 0;}
+h1{font-weight: bold; font-size: 31px; letter-spacing: -1px; color: #FFF; line-height: 33px;}
+h3{font-weight: bold; font-size: 12px; color: #777; text-transform: uppercase; margin: 18px 0 0 0;}
+p{margin: 8px 0 20px 0; line-height: 18px;}
+a, a:visited{color: #72B6E5; text-decoration: none;}
+a:hover{text-decoration: underline;}
+
+.wrapper{display: block; padding: 4px 30px 0 30px;}
+
+.map{background-color:#eee; position: absolute; top: 0; left: 0; bottom: 0; width: 67%; *height:100%;}
+.sidepanel{background-color:#333; position: absolute; top: 0; right: 0; bottom: 0; width: 44%; height: 100%; overflow: auto;}
+
+.context{font-family: Helvetica, Arial; font-size: 13px; color: #999; padding: 10px 0 0 0;}
+.subheader{border-bottom: 1px solid #555;}
+.footer{border-top: 1px solid #555; margin-top: 30px;}
+.titleBlock{text-align: right;}
