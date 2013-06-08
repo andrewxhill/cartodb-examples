@@ -122,6 +122,7 @@
     var tod = new Date();
         tod.setHours(2);
         tod.setMinutes(0);
+
     var curtod = SunCalc.getTimes(tod, 40.734698,-73.995667);
         curtod = new Date(curtod.sunset);
 
@@ -187,7 +188,8 @@
         var t = 0;
         var button = document.getElementById('start_animation');
         function animate(){
-          curtod = SunCalc.getTimes(curtod.setTime( tod.getTime() + t * 1000 * 60 * 60 * 24 ), 40.734698,-73.995667);
+          var c = map.getCenter();
+          curtod = SunCalc.getTimes(curtod.setTime( tod.getTime() + t * 1000 * 60 * 60 * 24 ), c.lat, c.lon);
           curtod = new Date(curtod.sunset);
           displayTime(curtod);
           t = t + 5;

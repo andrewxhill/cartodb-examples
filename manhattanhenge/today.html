@@ -34,7 +34,9 @@
 
       function sketchLine(ctx, p0, p1) {
 
-          var sunrisePos = SunCalc.getPosition(curtod, 40.734698,-73.995667);
+          
+          var c = map.getCenter();
+          var sunrisePos = SunCalc.getPosition(curtod, c.lat, c.lon);
 
            var dx = p1.x - p0.x;
            var dy = p1.y - p0.y;
