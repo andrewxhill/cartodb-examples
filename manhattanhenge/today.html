@@ -34,7 +34,7 @@
 
       function sketchLine(ctx, p0, p1) {
 
-          
+
           var c = map.getCenter();
           var sunrisePos = SunCalc.getPosition(curtod, c.lat, c.lon);
 
@@ -136,7 +136,7 @@
     }
 
     var map;
-    function initMap() {
+    function initMap(table) {
         displayTime(curtod);
 
         VECNIK.Carto.init(function(carto) {
@@ -157,9 +157,10 @@
            ENABLE_FIXING: true,
            ENABLE_SNAPPING: true, 
         });
+
         var dataSource = new VECNIK.CartoDB.API({
            user: 'viz2',
-           table: 'ny',
+           table: table,
            debug: true
         });
 
@@ -274,14 +275,56 @@ textarea {
   font-size: 19px;
 }
 
+#tn {
+  position: absolute;
+  left: 30px;
+  bottom: 54px;
+  background-color: #AAA;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+  padding: 4px;
+  font: bold 16px Helvetica;
+  width: 160px;
+  height: 22px;
+}
+#user {
+  position: absolute;
+  left: 30px;
+  bottom: 14px;
+  background-color: #AAA;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+  padding: 4px;
+  font: bold 16px Helvetica;
+  width: 160px;
+  height: 22px;
+}
 
 </style>
 </head>
-   <body onload="initMap()">
+   <body>
    <div id="map"></div>
   <!--<div id="livecode" class="highlight">-->
    </div>
    <a href='#' class="button" id="start_animation">start animation</a>
    <div class="tod" id="tod"></div>
+   <input name='user' id='user' value='viz2' />
+   <input name='tablename' id='tn' value='ny' />
+   <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+   <script>
+    initMap('ny');
+    $('#tn').change(function(t){
+      var sql = new cartodb.SQL({ user: $("#user").val()});
+      var table = $(this).val();
+      sql.execute("SELECT ST_X(geom) x, ST_Y(geom) y FROM (SELECT ST_Centroid(ST_Envelope(ST_Collect(the_geom))) geom FROM {{table_name}}) a", {table_name: table})
+      .done(function(json) {
+        console.log(json.rows[0])
+        initMap(table)
+        map.setCenterZoom(new MM.Location(json.rows[0].y, json.rows[0].x), 13);
+      })
+    })
+   </script>
 </body>
 </html>
