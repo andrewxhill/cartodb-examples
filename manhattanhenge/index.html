@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--Edit the title of the page-->
+    <title>Gallery</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="css/makeitresponsive.css">
+    <style>
+    @import url("https://fonts.googleapis.com/css?family=Lato:400,700,700italic,900,400italic,300");
+      body {
+        background: #2C3E50;
+        color: white;
+        font-family: Britannic Bold, Arial; 
+        margin: 0; padding: 0;
+      }
+      .header{
+        margin: 0; padding: 10px;
+        width: 100%; 
+        position: relative;
+        background-color: #E74C3C;
+        height: 40px;
+        font-size: 40px;
+      }
+      .header span {
+        float: right;
+        font-size: 16px;
+        padding-top: 16px;
+        color: #F1C40F;
+      }
+      .header span a {
+        text-decoration: none;
+        color: #2C3E50;
+      }
+      .container{
+/*        width: 80%;
+        margin: 0 10% 0 10%;
+        padding: 0;
+        position: relative;
+        float: left;*/
+        position: absolute;
+        width: 700px;
+        left: 50%;
+        margin-left: -350px;
+      }
+      .content .column {
+        width: 80%;
+        margin: 0 10% 0 10%;
+        padding: 0;
+        position: relative;
+        float: left;
+      }
+      .content .container .block {
+        float: left;
+        position: relative;
+        padding: 10px; margin: 10px;
+        display: inline-block;
+        vertical-align: top;
+        background: #E67E22;
+        height: 300px; width: 300px;
+      }
+      </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="container">
+        Cityhenge
+        <span class="contact">
+          say hi <a href="http://twitter.com/andrewxhill">@andrewxhill</a>
+      </span>
+      </div>
+    </div>
+    <div class="content">
+      <div class="container">
+
+        <div class="block">
+          <a href="city/nyc.html">
+            <img src="img/nyc.png" />
+          </a>
+        </div>
+
+
+        <div class="block">
+          <a href="city/chicago.html">
+            <img src="img/chicago.png" />
+          </a>
+        </div>
+
+
+        <div class="block">
+          <a href="city/dc.html">
+            <img src="img/dc.png" />
+          </a>
+        </div>
+
+
+        <div class="block">
+          <a href="city/sf.html">
+            <img src="img/sf.png" />
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>

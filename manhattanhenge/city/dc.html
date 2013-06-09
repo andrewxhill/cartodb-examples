@@ -3,37 +3,36 @@
 <head>
 <title>Sunset map</title>
 
-<script type="text/javascript" src="js/core.js"></script>
-<script type="text/javascript" src="js/settings.js"></script>
-<script type="text/javascript" src="js/mercator.js"></script>
-<script type="text/javascript" src="js/geometry.js"></script>
-<script type="text/javascript" src="js/model.js"></script>
-<script type="text/javascript" src="js/renderer.js"></script>
-<script type="text/javascript" src="js/shader.js"></script>
+<script type="text/javascript" src="../js/core.js"></script>
+<script type="text/javascript" src="../js/settings.js"></script>
+<script type="text/javascript" src="../js/mercator.js"></script>
+<script type="text/javascript" src="../js/geometry.js"></script>
+<script type="text/javascript" src="../js/model.js"></script>
+<script type="text/javascript" src="../js/renderer.js"></script>
+<script type="text/javascript" src="../js/shader.js"></script>
 
 
-<script type="text/javascript" src="js/cartodb.sql.js"></script>
-<script type="text/javascript" src="js/cartodb.provider.js"></script>
+<script type="text/javascript" src="../js/cartodb.sql.js"></script>
+<script type="text/javascript" src="../js/cartodb.provider.js"></script>
 
 <!-- carto -->
-<script src='libs/underscore.js' type='text/javascript'></script>
-<script src='libs/carto.js' type='text/javascript'></script>
+<script src='../libs/underscore.js' type='text/javascript'></script>
+<script src='../libs/carto.js' type='text/javascript'></script>
 
-<script type="text/javascript" src="libs/suncalc.js"></script>
-<script type="text/javascript" src="libs/modestmaps.js"></script>
-<script type="text/javascript" src="js/vecnik.modestmaps.js"></script>
+<script type="text/javascript" src="../libs/suncalc.js"></script>
+<script type="text/javascript" src="../libs/modestmaps.js"></script>
+<script type="text/javascript" src="../js/vecnik.modestmaps.js"></script>
 
-<script type="text/javascript" src="js/carto.js"></script>
+<script type="text/javascript" src="../js/carto.js"></script>
 
 <script type="text/javascript">
     function SketchRender() {
       RND_FACTOR = 1;
       rnd = function() { return RND_FACTOR*( 2*Math.random() -1) ;}
 
-      var times = SunCalc.getTimes(curtod, 40.734698,-73.995667);
+      var times = SunCalc.getTimes(curtod,38.8993524437598, -77.0319457761469 );
 
       function sketchLine(ctx, p0, p1) {
-
 
           var c = map.getCenter();
           var sunrisePos = SunCalc.getPosition(curtod, c.lat, c.lon);
@@ -47,15 +46,7 @@
          }
 
          var lw = 0.4;
-        if (sunrisePos.altitude < 0.1){
-          //NIGHT TIME
-          // console.log('night')
-          ctx.strokeStyle = "rgba(0,0,0, 1)";
-          lw = 0.4
-        } else {
-         //higher sun = greater tolerance 
-         var tolerance = 0.20*sunrisePos.altitude/Math.PI;
-              // tolerance = 0.05;
+         var tolerance = 0.05;
 
          var r = Math.atan2(p1.y - p0.y, p1.x - p0.x) + 0.5*Math.PI;
          var d = Math.abs((r + Math.PI -  sunrisePos.azimuth) % (Math.PI*2) - Math.PI)
@@ -78,7 +69,7 @@
           ctx.strokeStyle = "rgba(0,0,0, 1)";
           lw = 0.4;
          }
-        }
+        // }
         for(var i = 0; i < 3; ++i) {
            ctx.beginPath();
            ctx.lineWidth = lw
@@ -124,19 +115,23 @@
     var tod = new Date();
         tod.setHours(2);
         tod.setMinutes(0);
-    var curtod = tod;
+
+    // var c = map.getCenter();
+    var curtod = SunCalc.getTimes(tod, 38.8993524437598, -77.0319457761469 );
+        curtod = new Date(curtod.sunset);
+
     function displayTime(t){
         // var t = new Date(o);
         var fieldNameElement = document.getElementById("tod");
-        hr = t.getHours()+3 + '';
+        hr = t.getMonth() + 1 + '';
         while (hr.length < 2) hr = '0'+hr;
-        mi = t.getMinutes() + '';
+        mi = t.getDate() + '';
         while (mi.length < 2) mi = '0'+mi;
-        fieldNameElement.innerHTML =  hr + ":" + mi;
+        fieldNameElement.innerHTML =  hr + " - " + mi;
     }
 
     var map;
-    function initMap(table) {
+    function initMap() {
         displayTime(curtod);
 
         VECNIK.Carto.init(function(carto) {
@@ -147,7 +142,7 @@
         // var stat = new Stats();
         
 
-        var template = 'img/bk.png'
+        var template = '../img/bk.png'
         var subdomains = [ '', 'a.', 'b.', 'c.' ];
         var provider = new MM.TemplatedLayer(template, subdomains);
 
@@ -157,10 +152,9 @@
            ENABLE_FIXING: true,
            ENABLE_SNAPPING: true, 
         });
-
         var dataSource = new VECNIK.CartoDB.API({
            user: 'viz2',
-           table: table,
+           table: 'henge_dc',
            debug: true
         });
 
@@ -182,22 +176,25 @@
         map = new MM.Map(document.getElementById('map'), [provider,  fg])
         
         if(!location.hash) {
-          map.setCenterZoom(new MM.Location(40.7199,-73.9694), 13);
+          map.setCenterZoom(new MM.Location(38.8993524437598, -77.0319457761469 ), 13);
         }
         var hash = new MM.Hash(map);
         var t = 0;
         var button = document.getElementById('start_animation');
         function animate(){
-          curtod = new Date(tod.getTime() + (t * 60000))
+          var c = map.getCenter();
+          curtod = SunCalc.getTimes(curtod.setTime( tod.getTime() + t * 1000 * 60 * 60 * 24 ), c.lat, c.lon);
+          curtod = new Date(curtod.sunset);
           displayTime(curtod);
-          t = t + 10;
+          t = t + 4;
+          // console.log(curtod)
           VECNIK.Carto.compile(
           "#world { line-width: 2; line-color: #000; [TYPEY='test']{ line-width: 2; } [ZOOM = 0]{ line-width: 2; } }", function(shaderData) {
               if(shaderData) {
                 shader.compile(shaderData);
               }
           });
-          if(t == 14*60) {
+          if(t == 365) {
             button.style.display = 'block';
           } else {
             setTimeout(animate, 1);
@@ -275,56 +272,14 @@ textarea {
   font-size: 19px;
 }
 
-#tn {
-  position: absolute;
-  left: 30px;
-  bottom: 54px;
-  background-color: #AAA;
-  border-radius: 4px;
-  color: white;
-  text-decoration: none;
-  padding: 4px;
-  font: bold 16px Helvetica;
-  width: 160px;
-  height: 22px;
-}
-#user {
-  position: absolute;
-  left: 30px;
-  bottom: 14px;
-  background-color: #AAA;
-  border-radius: 4px;
-  color: white;
-  text-decoration: none;
-  padding: 4px;
-  font: bold 16px Helvetica;
-  width: 160px;
-  height: 22px;
-}
 
 </style>
 </head>
-   <body>
+   <body onload="initMap()">
    <div id="map"></div>
   <!--<div id="livecode" class="highlight">-->
    </div>
    <a href='#' class="button" id="start_animation">start animation</a>
    <div class="tod" id="tod"></div>
-   <input name='user' id='user' value='viz2' />
-   <input name='tablename' id='tn' value='ny' />
-   <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
-   <script>
-    initMap('ny');
-    $('#tn').change(function(t){
-      var sql = new cartodb.SQL({ user: $("#user").val()});
-      var table = $(this).val();
-      sql.execute("SELECT ST_X(geom) x, ST_Y(geom) y FROM (SELECT ST_Centroid(ST_Envelope(ST_Collect(the_geom))) geom FROM {{table_name}}) a", {table_name: table})
-      .done(function(json) {
-        console.log(json.rows[0])
-        initMap(table)
-        map.setCenterZoom(new MM.Location(json.rows[0].y, json.rows[0].x), 13);
-      })
-    })
-   </script>
 </body>
 </html>
