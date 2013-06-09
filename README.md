@@ -48,5 +48,9 @@ or taking a look at places where Manhattanhenge happens for any day of the year,
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/year.html)
 
+see a couple of other cities,
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/index.html)
+
 
 
