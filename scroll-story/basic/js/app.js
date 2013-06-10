@@ -49,6 +49,18 @@ var position = new L.LatLng(40.716086427192394, -73.99330615997314);
 var zoom = 15; 
 var map = new L.Map('map').setView(position, zoom);
 
+function legendup(data){
+  $('.array .blocks .block').remove();
+  if (data){
+    for(var i=0; i<data.length; ++i){
+      var v = $('<div class="block"></div>');
+      var c = $('<span class="color"></span>').css('background', data[i].color);
+      v.append(c);
+      v.append($('<span class="text">'+data[i].text+'</span>'))
+      $('.array .blocks').append(v)
+    }
+  }
+}
 
 cartodb.createLayer(map, {
   type: 'cartodb',
@@ -83,6 +95,13 @@ updateViz(currentViz);
     cartodb.log.log("some error occurred");
   });
 
+    legendup([
+      {color: 'violet', text: 'both'},
+      {text: '1839 data', color: 'red'},
+      {text: '1854 data', color: 'yellow'}
+    ])
+
+
 var viz = {
   currentlayer: null,
   0: function(){
@@ -106,6 +125,12 @@ var viz = {
     var position = new L.LatLng(40.7182, -73.9952);
     var zoom = 15; 
     map.setView(position, zoom);
+    legendup([
+      {color: '#4a8dcb', text: 'metal roof'},
+      {color: '#f2b357', text: 'wood frame'},
+      {color: '#92d42d', text: 'brick/stone'}
+    ])
+
     setTimeout(function(){
       mapLayers[0].hide();
       mapLayers[1].setOptions({
@@ -126,6 +151,12 @@ var viz = {
     map.setView(position, zoom);
     setTimeout(function(){
 
+    legendup([
+      {color: '#4a8dcb', text: 'metal roof'},
+      {color: '#f2b357', text: 'wood frame'},
+      {color: '#92d42d', text: 'brick/stone'}
+    ])
+
       mapLayers[0].hide();
       mapLayers[1].setOptions({
             query: "SELECT * FROM buildings_1854",
@@ -141,6 +172,7 @@ var viz = {
     var position = new L.LatLng(40.7182, -73.9952);
     var zoom = 14; 
     map.setView(position, zoom);
+    legendup()
     setTimeout(function(){
       mapLayers[0].show();
       mapLayers[1].setOptions({
@@ -158,6 +190,10 @@ var viz = {
     var position = new L.LatLng(40.7182, -73.9952);
     var zoom = 14; 
     map.setView(position, zoom);
+    legendup([
+      {color: 'red', text: 'source'},
+      {color: 'blue', text: 'target'}
+    ])
     setTimeout(function(){
       mapLayers[0].show();
       mapLayers[1].setOptions({
@@ -174,6 +210,10 @@ var viz = {
       var position = new L.LatLng(40.71, -74.005);
       var zoom = 15; 
     map.setView(position, zoom);
+    legendup([
+      {color: 'red', text: 'source'},
+      {color: 'blue', text: 'target'}
+    ])
     setTimeout(function(){
       mapLayers[0].show();
       mapLayers[1].setOptions({
@@ -200,6 +240,11 @@ var viz = {
 }
 
 
+    $('#zoom_to_0').click(function(){
+      var position = new L.LatLng(40.716086427192394, -73.99330615997314);
+      var zoom = 15; 
+      map.setView(position, zoom)
+    })
     $('#zoom_to_2').click(function(){
       var position = new L.LatLng(40.708694, -74.000833);
       var zoom = 22; 
@@ -210,7 +255,9 @@ var viz = {
       var zoom = 20; 
       map.setView(position, zoom)
     })
-
+    $("#legend").hover(function(){
+      $('.array').toggle();
+    })
 // function setLayer(){
 //   viz[currentViz]();
 // }
@@ -219,7 +266,7 @@ function updateViz(layer){
   if (layer in viz){
     currentViz = layer;
     clearTimeout($.data(this, "scrollTimer"));
-    $.data(this, "scrollTimer", setTimeout(viz[currentViz], 350));
+    $.data(this, "scrollTimer", setTimeout(viz[currentViz], 500));
 
     // viz[layer]();
   }

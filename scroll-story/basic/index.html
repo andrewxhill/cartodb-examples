@@ -15,12 +15,56 @@
     <link rel="stylesheet" href="css/dark-theme.css">
     <link rel="stylesheet" href="css/makeitresponsive.css">
     <style>
+      #legend {
+        position: absolute;
+        top: 6px;
+        left: 60px;
+        color: #ccc;
+        z-index: 100;
+/*        -webkit-transform: rotate(-90deg); 
+        -moz-transform: rotate(-90deg); */
+      }
+      #legend .array{
+        display: none;
+        position: absolute;
+        top: 20px;
+        left: 54;
+        height: 300px;
+        width: 45px;
+/*        -webkit-transform: rotate(90deg); 
+        -moz-transform: rotate(90deg); */
+      }
+      #legend .array .block{
+        position: relative;
+        float: left;
+        white-space:nowrap;
+      }
+      #legend .array .block .text{
+        line-height: 20px;
+      }
+      #legend .array .block .color{
+        position: relative;
+        float: left;
+        height: 12px;
+        width: 12px;
+        background: green;
+        margin: 5px;
+      }
       #map {background: black;}
       </style>
     <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
   </head>
   <body>
-
+    <div id="legend">
+      legend
+      <div class="array">
+        <div class="blocks">
+          <div class="block"><span class="color"></span><span class="text">hiyea</span></div>
+          <div class="block"><span class="color"></span><span class="text"></span></div>
+          <div class="block"><span class="color"></span><span class="text"></span></div>
+        </div>
+      </div>
+    </div>
     <div class="map" id="map"></div>
 
     <div class="sidepanel">
