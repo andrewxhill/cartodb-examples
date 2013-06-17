@@ -1,5 +1,6 @@
 
     
+    var tod, map, curtod, city;
 
     function SketchRender() {
       RND_FACTOR = 1;
@@ -94,13 +95,10 @@
     var d = new Date();
     var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
 
-    var tod = new Date(utc + (3600000*city.offset));
         // tod.setHours(2);
         // tod.setMinutes(0);
 
     // var c = map.getCenter();
-    var curtod = SunCalc.getTimes(tod, city.y, city.x );
-        curtod = new Date(curtod.sunset);
 
     function displayTime(t){
         // var t = new Date(o);
@@ -112,8 +110,11 @@
         fieldNameElement.innerHTML =  hr + " - " + mi;
     }
 
-    var map;
-    function initMap() {
+    function initMap(options) {
+        city = options;
+        tod = new Date(utc + (3600000*city.offset));
+        var tt = SunCalc.getTimes(tod, city.y, city.x );
+        curtod = new Date(tt.sunset);
 
         displayTime(curtod);
 
@@ -198,8 +199,8 @@
 
         document.getElementById('rangeinput').addEventListener('change', function(ev){
             var c = map.getCenter();
-            curtod = SunCalc.getTimes(curtod.setTime( tod.getTime() + document.getElementById('rangeinput').value * 1000 * 60 * 60 * 24 ), c.lat, c.lon);
-            curtod = new Date(curtod.sunset);
+            var tt = SunCalc.getTimes(curtod.setTime( tod.getTime() + document.getElementById('rangeinput').value * 1000 * 60 * 60 * 24 ), c.lat, c.lon);
+            curtod = new Date(tt.sunset);
             displayTime(curtod);
         },false);
         document.getElementById('rangeinput').addEventListener('mouseup', function(ev){
