@@ -70,7 +70,8 @@ cartodb.createLayer(map, {
       interaction: false,
       query: "SELECT the_geom_webmercator FROM buildings_1854",
       interaction: false,
-      tile_style: "#{{table_name}}{ polygon-fill:white;polygon-opacity: 0.2;line-width: 0;}"
+      tile_style: "#{{table_name}}{ polygon-fill:white;polygon-opacity: 0.2;line-width: 0;}",
+      extra_params: { cache_buster: "rambo_is_the_best" }
       }
   })
  .on('done', function(layer) {
@@ -82,7 +83,9 @@ cartodb.createLayer(map, {
     cartodb.createLayer(map, 'http://osm2.cartodb.com/api/v1/viz/building_comments_1854/viz.json', {
         query: "SELECT *, 1 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND  cartodb_id IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) union all SELECT *, 2 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND cartodb_id NOT IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) UNION ALL SELECT *, 3 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) AND cartodb_id NOT IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) UNION ALL SELECT *, 4 as layer FROM buildings_1854 WHERE cartodb_id NOT IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND  cartodb_id NOT IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL)",
         interaction: false,
-        tile_style: "#{{table_name}}{polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 1;  [layer = 1] {   polygon-fill: violet;  polygon-opacity: 1;  }  [layer = 2] {   polygon-fill: red;  polygon-opacity: 0.7;  }  [layer = 3] {   polygon-fill: yellow;  polygon-opacity: 0.7;  }}"})
+        tile_style: "#{{table_name}}{polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 1;  [layer = 1] {   polygon-fill: violet;  polygon-opacity: 1;  }  [layer = 2] {   polygon-fill: red;  polygon-opacity: 0.7;  }  [layer = 3] {   polygon-fill: yellow;  polygon-opacity: 0.7;  }}",
+        extra_params: { cache_buster: "rambo_is_the_best" }
+      })
      .on('done', function(layer2) {
       map.addLayer(layer2);
       mapLayers.push(layer2);
