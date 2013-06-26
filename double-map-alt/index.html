@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--Edit the title of the page-->
+    <title>Your page title goes here</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+    <link rel="stylesheet" href="css/makeitresponsive.css">
+    <!--Switch between the different themes changing the stylesheet below - light-theme.css |dark-theme.css -->
+    <link rel="stylesheet" href="css/dark-theme.css">
+  </head>
+  <body>
+    
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 context subheader">
+        <!--Link to your personal website, your blog or your twitter account-->
+        <p>Map created by <a href="#">{Link to your website}</a></p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+    <!--In the paragraph below give an introduction to your visualization-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12">
+        <h1>Barcelona traffic at two different times</h1>
+        <p>The double panel map is perfect for comparing datasets collected at different times. Here, we are showing the traffic congestion in Barcelona during the <a href=''>Mobile World Conference</a> and then the traffic one week later.</p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+    
+    <div class="row">
+      <div class="col span8 map" id="map1"></div>
+      <div class="col span8 map" id="map2"></div>
+    </div>
+
+    <!--Copy and paste the "row" div below a second, third, or fourth time to create content blocks-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 titleBlock">
+        <h3>Description block</h3>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12">
+        <p>The double panel is both useful for when you have obvious differences that you want to show immediately and for cases where you want to encourage the user to explore the map carefully to discover the differences. In the case above, it may not look different immediately, but if you were planning a drive during the MWC, you may want to look more carefully.</p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+    <!--This is an example of a second content block-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 titleBlock">
+        <h3>Description block 2</h3>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12">
+        <p>We hope you enjoy <a href="#">our templates</a> and we will continue creating new ones as much as we can!</p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+    <!--Play fair and keep the attributions. If you do so, we will love you even more. :)-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 context footer">
+        <p>Create your maps with ease using <a href="http://cartodb.com">CartoDB</a></p></p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&v=3.8"></script>
+    <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+
+    <!--Change the URL's below in order to change the maps that are being shown.
+        map1 is the one on the left side and map2 is the one on the right side.
+        Go to your map view in CartoDB, click on share, and copy the URL under the API section
+        Check the cartodb.js documentation for more info
+        http://developers.cartodb.com/documentation/cartodb-js.html-->
+    <script type="text/javascript">
+      var map1,map2;
+
+      cartodb.createVis('map1', 'http://osm2.cartodb.com/api/v1/viz/2666/viz.json')
+      .done(function(vis, layers) {
+        map1 = vis.mapView.map;
+        cartodb.createVis('map2', 'http://osm2.cartodb.com/api/v1/viz/2670/viz.json')
+        .done(function(vis, layers) {
+            map2 = vis.mapView.map;
+            changeMapState(map1, map2, false);
+            map1.on('change:zoom change:center', function(e) {
+              // console.log(map1.getBounds())
+              changeMapState(map1, map2, false);
+            });
+            map2.on('change:zoom change:center', function(e) {
+              changeMapState(map2, map1, true);
+            });
+        })
+      })
+
+      //Applies the same view from src to tgt map
+      function changeMapState(src,tgt,invert){
+        console.log(invert)
+        if (invert){
+          var center = [
+            (src.get('view_bounds_ne')[0] + src.get('view_bounds_sw')[0])/2,
+             src.get('view_bounds_sw')[1] + (src.get('view_bounds_sw')[1] - src.get('view_bounds_ne')[1] )/2,
+          ]
+        } else {
+          var center = [
+            (src.get('view_bounds_ne')[0] + src.get('view_bounds_sw')[0])/2,
+             src.get('view_bounds_ne')[1] - (src.get('view_bounds_sw')[1] - src.get('view_bounds_ne')[1] )/2,
+          ]
+        }
+        tgt.set({
+            'center': center,
+            'zoom': src.get('zoom')
+        });
+      }
+
+    </script>
+
+  </body>
+</html>
