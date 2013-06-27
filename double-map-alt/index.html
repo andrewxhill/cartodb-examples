@@ -91,43 +91,48 @@
         Check the cartodb.js documentation for more info
         http://developers.cartodb.com/documentation/cartodb-js.html-->
     <script type="text/javascript">
-      var map1,map2;
+      var map1,map2,mapA,mapB,x_offset;
 
       cartodb.createVis('map1', 'http://osm2.cartodb.com/api/v1/viz/2666/viz.json')
       .done(function(vis, layers) {
-        map1 = vis.mapView.map;
+        map1 = layers[0].map; 
+        mapA = vis.mapView.map;
+        map1.setCenter(new google.maps.LatLng(41.39556286698939, 2.101306915283203))
         cartodb.createVis('map2', 'http://osm2.cartodb.com/api/v1/viz/2670/viz.json')
         .done(function(vis, layers) {
-            map2 = vis.mapView.map;
-            layers[1].setCartoCSS("#{{table_name}}{ line-color:#3f85c2; line-width: 3; }");
+            map2 = layers[0].map; 
+            mapB = vis.mapView.map;
+            x_offset = getOffset(map1,map2);
             changeMapState(map1, map2, false);
-            map1.on('change:zoom change:center', function(e) {
-              // console.log(map1.getBounds())
+            mapA.on('change:zoom change:center', function(e) {
               changeMapState(map1, map2, false);
             });
-            map2.on('change:zoom change:center', function(e) {
+            mapB.on('change:zoom change:center', function(e) {
               changeMapState(map2, map1, true);
             });
         })
       })
 
+      function getOffset(left, right){
+        var lb = left.getBounds();
+        var rb = right.getBounds();
+        var r = lb.getSouthWest().lng(),
+            m1 =lb.getNorthEast().lng(),
+            m2 =rb.getSouthWest().lng(),
+            l = rb.getNorthEast().lng();
+        return ((m1 - r)/2) + ((l - m2)/2)
+      }
+
       //Applies the same view from src to tgt map
       function changeMapState(src,tgt,invert){
+        var lat = src.getCenter().lat();
         if (invert){
-          var center = [
-            (src.get('view_bounds_ne')[0] + src.get('view_bounds_sw')[0])/2,
-             src.get('view_bounds_sw')[1] + (src.get('view_bounds_sw')[1] - src.get('view_bounds_ne')[1] )/2,
-          ]
+          var lng = src.getCenter().lng() - x_offset;
         } else {
-          var center = [
-            (src.get('view_bounds_ne')[0] + src.get('view_bounds_sw')[0])/2,
-             src.get('view_bounds_ne')[1] - (src.get('view_bounds_sw')[1] - src.get('view_bounds_ne')[1] )/2,
-          ]
+          var lng = src.getCenter().lng() + x_offset;
         }
-        tgt.set({
-            'center': center,
-            'zoom': src.get('zoom')
-        });
+        tgt.setZoom(src.getZoom());
+        tgt.setCenter(new google.maps.LatLng(lat, lng))
       }
 
     </script>
