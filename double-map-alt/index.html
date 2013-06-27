@@ -91,7 +91,7 @@
         Check the cartodb.js documentation for more info
         http://developers.cartodb.com/documentation/cartodb-js.html-->
     <script type="text/javascript">
-      var map1,map2,mapA,mapB,x_offset;
+      var map1,map2,mapA,mapB; //,x_offset;
 
       cartodb.createVis('map1', 'http://osm2.cartodb.com/api/v1/viz/2666/viz.json')
       .done(function(vis, layers) {
@@ -102,7 +102,7 @@
         .done(function(vis, layers) {
             map2 = layers[0].map; 
             mapB = vis.mapView.map;
-            x_offset = getOffset(map1,map2);
+            // x_offset = getOffset(map1,map2);
             changeMapState(map1, map2, false);
             mapA.on('change:zoom change:center', function(e) {
               changeMapState(map1, map2, false);
@@ -125,6 +125,7 @@
 
       //Applies the same view from src to tgt map
       function changeMapState(src,tgt,invert){
+        var x_offset = getOffset(map1,map2);
         var lat = src.getCenter().lat();
         if (invert){
           var lng = src.getCenter().lng() - x_offset;
