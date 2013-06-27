@@ -2,6 +2,32 @@
 
 Contact [@andrewxhill](http://twitter.com/andrewxhill)
 
+#### Scrolling stories with CartoDB templates and multiple maps
+
+A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/basic/index.html)
+
+#### Sun position plus street orientation
+
+Demo I put together of the VECNIK vector rendering with current sunposition to find streets getting a lot of sun exposure
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/today.html)
+
+or taking a look at places where Manhattanhenge happens for any day of the year,
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/year.html)
+
+see a couple of other cities,
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/index.html)
+
+#### Two maps, one center
+
+This is a really quick mod of the CartoDB double map template. In the [orignal template](http://cartodb.github.io/cartodb-publishing-templates/doublemap/), both maps have the same center, and moving one map moves the other. A question on our forum from [Michael Keller](https://twitter.com/mhkeller) prompted me to make this version, where there is only a single center, so one map bleeds into the other. Hacky hacky
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/double-map-alt/index.html)
+
 #### Writable Polygon
 
 This example uses PostgreSQL to turn CartoDB into a form submit endpoint without any proxy layer.
@@ -31,26 +57,6 @@ with canvas,
 or with Vimeo,
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/videomap/video-inset/index.html)
-
-#### Scrolling stories with CartoDB templates and multiple maps
-
-A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
-
- - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/basic/index.html)
-
-#### Sun position plus street orientation
-
-Demo I put together of the VECNIK vector rendering with current sunposition to find streets getting a lot of sun exposure
-
- - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/today.html)
-
-or taking a look at places where Manhattanhenge happens for any day of the year,
-
- - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/year.html)
-
-see a couple of other cities,
-
- - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/index.html)
 
 
 
