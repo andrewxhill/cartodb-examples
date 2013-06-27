@@ -99,6 +99,7 @@
         cartodb.createVis('map2', 'http://osm2.cartodb.com/api/v1/viz/2670/viz.json')
         .done(function(vis, layers) {
             map2 = vis.mapView.map;
+            layers[1].setCartoCSS("#{{table_name}}{ line-color:#3f85c2; line-width: 3; }");
             changeMapState(map1, map2, false);
             map1.on('change:zoom change:center', function(e) {
               // console.log(map1.getBounds())
@@ -112,7 +113,6 @@
 
       //Applies the same view from src to tgt map
       function changeMapState(src,tgt,invert){
-        console.log(invert)
         if (invert){
           var center = [
             (src.get('view_bounds_ne')[0] + src.get('view_bounds_sw')[0])/2,
