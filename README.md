@@ -28,6 +28,12 @@ This is a really quick mod of the CartoDB double map template. In the [orignal t
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/double-map-alt/index.html)
 
+#### Smart markers
+
+Often times users will want to create a marker layer where the markers come from CartoDB. If you have a large dataset, this can get annoying, dealing with overlaps and not loading too much data at once. In this example, I create a leaflet marker layer limited to the current zoom and bounding box. Within the view, I limit it to one marker per ever 40px square. With every pan and zoom I query new points to fill the space. 
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/smart-markers/index.html)
+
 #### Writable Polygon
 
 This example uses PostgreSQL to turn CartoDB into a form submit endpoint without any proxy layer.
