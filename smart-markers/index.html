@@ -81,8 +81,8 @@
         var limit = remove ? 50 : 25;
         var zoom = map.getZoom();
         var bounds = map.getBounds();
-        
-        var frame = "ST_Envelope(ST_MakeLine(CDB_LatLng("+bounds.getNorthWest().lat+","+bounds.getNorthWest().lng+"),CDB_LatLng("+bounds.getSouthEast().lat+","+bounds.getSouthEast().lng+")))";
+        var buffer = (bounds.getNorthEast().lat - bounds.getSouthWest().lat)/5;
+        var frame = "ST_Envelope(ST_MakeLine(CDB_LatLng("+(bounds.getNorthWest().lat+buffer)+","+(bounds.getNorthWest().lng-buffer)+"),CDB_LatLng("+(bounds.getSouthEast().lat-buffer)+","+(bounds.getSouthEast().lng+buffer)+")))";
 
         //the bigger the geobucket number the more spread out the markers
         sql.execute("WITH rg AS (SELECT cartodb_id, floor(st_x(the_geom_webmercator)/({{geobucket}} * CDB_XYZ_Resolution({{z}}))) mx, floor(st_y(the_geom_webmercator)/({{geobucket}} * CDB_XYZ_Resolution({{z}}))) my, st_x(the_geom) x, st_y(the_geom) y, turi, uri FROM {{table_name}} WHERE {{frame}} && the_geom ORDER BY created_at DESC LIMIT {{limit}}) SELECT DISTINCT ON (mx,my) cartodb_id, x, y, turi, uri FROM rg", {table_name: 'instagrams', frame: frame, z: zoom, geobucket: 120, limit: limit})
