@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gmaps layer toggle | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background: black;
+      }
+
+      #layer_selector {
+        position: absolute;
+        top: 40px;
+        right: 20px;
+        padding: 0;
+      }
+      #layer_selector ul {
+        padding: 0; margin: 0;
+        list-style-type: none;
+      }
+      #layer_selector li {
+        border-bottom: 1px solid #999999;
+        padding: 15px 30px;
+        font-family: "Helvetica",Arial;
+        font-size: 13px;
+        color: #444;
+        cursor: auto;
+      }
+      #layer_selector li:hover {
+        background-color: #F0F0F0;
+        cursor: pointer;
+      }
+      #layer_selector li.selected {
+        background-color: #EEE;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="layer_selector" class="cartodb_infobox">
+      <ul>
+        <li data="streets" class="selected">Manhattan Streets</li>
+        <li data="stores">Manhattan Stores</li>
+        <li data="people">Manhattan Density</li>
+      </ul>
+    </div>
+
+    <!-- include google maps library *before* load cartodb.js -->
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+
+    <script>
+      var layers = {};
+
+      function createSelector() {
+
+        var $options = $('#layer_selector li');
+        $options.click(function(e) {
+
+          // get the area of the selected layer
+          var $li = $(e.target);
+          var layer_name = $li.attr('data');
+
+          // deselect all and select the clicked one
+          $options.removeClass('selected');
+          $li.addClass('selected');
+
+          // // create query based on data from the layer
+          // var query = "select * from european_countries_e";
+          // if(area !== 'all') {
+          //   query = "select * from european_countries_e where area > " + area;
+          // }
+          map.overlayMapTypes.setAt(0, layers[layer_name]);
+
+          // change the query in the layer to update the map
+          // layer.setQuery(query);
+        });
+      }
+      function main() {
+        // var map;
+
+        // create google maps map
+        var mapOptions = {
+          zoom: 13,
+          center: new google.maps.LatLng(40.77, -73.95),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById('map'),  mapOptions);
+
+        cartodb.createLayer(map, 'http://viz2.cartodb.com/api/v1/viz/bagitnyc_streets/viz.json')
+         .on('done', function(layer) {
+          map.overlayMapTypes.setAt(0, layer);
+          layers['streets'] = layer;
+        }).on('error', function() {
+          cartodb.log.log("some error occurred");
+        });
+
+        cartodb.createLayer(map, 'http://viz2.cartodb.com/api/v1/viz/bagitnyc_consumers/viz.json')
+         .on('done', function(layer) {
+          // map.overlayMapTypes.setAt(0, layer);
+          layers['people'] = layer;
+        }).on('error', function() {
+          cartodb.log.log("some error occurred");
+        });
+
+        cartodb.createLayer(map, 'http://viz2.cartodb.com/api/v1/viz/bagitnyc_sources/viz.json')
+         .on('done', function(layer) {
+          // map.overlayMapTypes.setAt(0, layer);
+          layers['stores'] = layer;
+        }).on('error', function() {
+          cartodb.log.log("some error occurred");
+        });
+
+        createSelector();
+      }
+
+      window.onload = main;
+    </script>
+  </body>
+</html>
