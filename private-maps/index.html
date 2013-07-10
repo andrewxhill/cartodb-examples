@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Private maps</title>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<script src="http://www.modernizr.com/downloads/modernizr-latest.js"></script>
+<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+<!--[if lte IE 8]>
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+<![endif]-->
+<!-- include google maps library *before* load cartodb.js -->
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<!-- include cartodb.js library -->
+<script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<form id="cartodb-private">
+<label for="username">user</label><input autocomplete=on type="text" name="username" id="user" class="placeholder" placeholder="user: viz2">
+<label for="password">api key</label><input autocomplete=on type="password" name="password" id="api_key" class="placeholder" placeholder="api key: 2kjfi2lk230KLj12lkj1!@j1llkjaswjsflk21">
+<label for="table">table</label><input type="text" name="table" id="table" class="placeholder" placeholder="table: fun_data">
+<input type="submit" id="submit" value="View map">
+</form>
+<script>
+var user, table, key;
+function main(){
+
+	var width = $(document).width();
+	var height = $(document).height();
+
+	var mapdiv = $('#map')
+					.css({
+						'width': Math.floor(0.9*width)+'px',
+						'height': Math.floor(0.9*height)+'px',
+						'position': 'absolute',
+						'top': Math.floor(0.05*height)+'px',
+						'left': Math.floor(0.05*width)+'px',
+						'background': 'green',
+						'z-index': 11111
+					});
+	$('body').append(mapdiv);
+
+	  var map = L.map('map', { 
+	    zoomControl: false,
+	    center: [37.783333, -122.3],
+	    zoom: 12
+	  })
+
+	  L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+	    attribution: 'Stamen'
+	  }).addTo(map);
+
+	mapdiv.hide();
+
+	$('form').submit(function(){
+		user = $('#user').val();
+		table = $('#table').val();
+		key = $('#api_key').val();
+		mapdiv.show();
+		$('#cartodb-private').hide();
+
+	      cartodb.createLayer(map, {
+	      	type: 'cartodb',
+	        options: {
+		        table_name: table,
+		        user_name: user,
+		        extra_params: {
+		          map_key: key
+		        }
+	        }
+	      })
+	      .done(function(layer) {
+	      	layer.options.extra_params.map_key = key;
+	      	var sql = new cartodb.SQL({ user: user, api_key: key});
+		    sql.getBounds("SELECT * FROM {{table_name}}", { table_name: table })
+		      .done(function(bounds) {
+		        map.fitBounds(bounds);
+		      })
+		      .error(function(err) {
+				mapdiv.hide();
+				$('#cartodb-private').show();
+		      });
+		     layer.addTo(map);
+	      })
+	      .error(function(err) {
+			mapdiv.hide();
+			$('#cartodb-private').show();
+	      });
+	   return false;
+	});
+}
+window.onload = main;
+</script>
+</body>
+</html>
