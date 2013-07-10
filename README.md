@@ -22,6 +22,12 @@ see a couple of other cities,
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/index.html)
 
+#### Share your private maps
+
+For when you have collaborators that you trust, a lot, but don't trust them enough not to mess up tables in your CartoDB account. Using this page, you can give them your account name, api_key (and trust them not to share it or leave it laying around!), table and they can view the maps you made. I'm improving the example to add support for the basemaps you select, infowindows, etc., but it will take a couple of weeks to update.
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/private-maps/index.html)
+
 #### Two maps, one center
 
 This is a really quick mod of the CartoDB double map template. In the [orignal template](http://cartodb.github.io/cartodb-publishing-templates/doublemap/), both maps have the same center, and moving one map moves the other. A question on our forum from [Michael Keller](https://twitter.com/mhkeller) prompted me to make this version, where there is only a single center, so one map bleeds into the other. Hacky hacky
