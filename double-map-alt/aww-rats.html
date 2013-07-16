@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--Edit the title of the page-->
+    <title>Rats and Trees in NYC</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.ie.css" />
+    <![endif]-->
+    <link rel="stylesheet" href="css/makeitresponsive.css">
+    <!--Switch between the different themes changing the stylesheet below - light-theme.css |dark-theme.css -->
+    <link rel="stylesheet" href="css/dark-theme.css">
+  </head>
+  <body>
+    
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 context subheader">
+        <!--Link to your personal website, your blog or your twitter account-->
+        <p>Map created by <a href="http://twitter.com/andrewxhill">@andrewxhill</a></p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+    <!--In the paragraph below give an introduction to your visualization-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12">
+        <h1>Rats and Trees in NYC</h1>
+        <p>I have no idea what the relationship is between these two datasets, but I wanted to see them together :)</p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+    
+    <div class="row">
+      <div class="col span8 map" id="map1"></div>
+      <div class="col span8 map" id="map2"></div>
+    </div>
+
+    <!--Copy and paste the "row" div below a second, third, or fourth time to create content blocks-->
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12 titleBlock">
+        <h3>Description block</h3>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+    <div class="row">
+      <div class="col span2 empty"><p></p></div>
+      <div class="col span12">
+        <p>The left panel is all rat sightenings reported to 311 between 2009 and 2013. The right panel are all the trees in NYC.</p>
+      </div>
+      <div class="col span2 empty"><p></p></div>
+    </div>
+
+
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&v=3.8"></script>
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.js"></script>
+
+    <!--Change the URL's below in order to change the maps that are being shown.
+        map1 is the one on the left side and map2 is the one on the right side.
+        Go to your map view in CartoDB, click on share, and copy the URL under the API section
+        Check the cartodb.js documentation for more info
+        http://developers.cartodb.com/documentation/cartodb-js.html-->
+    <script type="text/javascript">
+      var map1,map2,mapA,mapB; //,x_offset;
+
+      cartodb.createVis('map1', 'http://viz2.cartodb.com/api/v2/viz/149f7874-ee50-11e2-9ec2-5404a6a683d5/viz.json')
+      .done(function(vis, layers) {
+        map1 = layers[0].map; 
+        mapA = vis.mapView.map;
+        map1.setCenter(new google.maps.LatLng(40.70715065958, -74.0173488951006 ))
+        cartodb.createVis('map2', 'http://viz2.cartodb.com/api/v2/viz/34fac634-ee53-11e2-a440-5404a6a683d5/viz.json',{zoomControl: false, loaderControl: false})
+        .done(function(vis, layers) {
+            map2 = layers[0].map; 
+            mapB = vis.mapView.map;
+            // x_offset = getOffset(map1,map2);
+            changeMapState(map1, map2, false);
+            mapA.on('change:zoom change:center', function(e) {
+              changeMapState(map1, map2, false);
+            });
+            mapB.on('change:zoom change:center', function(e) {
+              changeMapState(map2, map1, true);
+            });
+            setTimeout(function(){
+              changeMapState(map1, map2, false);
+            },300)
+        })
+      })
+
+      function getOffset(left, right){
+        var lb = left.getBounds();
+        var rb = right.getBounds();
+        var r = lb.getSouthWest().lng(),
+            m1 =lb.getNorthEast().lng(),
+            m2 =rb.getSouthWest().lng(),
+            l = rb.getNorthEast().lng();
+        return ((m1 - r)/2) + ((l - m2)/2)
+      }
+
+      //Applies the same view from src to tgt map
+      function changeMapState(src,tgt,invert){
+        var x_offset = getOffset(map1,map2);
+        var lat = src.getCenter().lat();
+        if (invert){
+          var lng = src.getCenter().lng() - x_offset;
+        } else {
+          var lng = src.getCenter().lng() + x_offset;
+        }
+        tgt.setZoom(src.getZoom());
+        tgt.setCenter(new google.maps.LatLng(lat, lng))
+      }
+
+    </script>
+
+  </body>
+</html>
