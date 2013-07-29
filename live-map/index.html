@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Easy example | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.js"></script>
+
+    <script>
+      var map, sql, layer;
+      function center() {
+        sql.execute('select ST_X(the_geom) lon, ST_Y(the_geom) lat from axh_moving_point ORDER BY cartodb_id DESC limit 1').done(function(data) {
+            map.panTo([data.rows[0].lat, data.rows[0].lon]);
+        });
+      }
+      function refresh() {
+        layer.invalidate();
+        setTimeout(refresh, 5000)
+      }
+      function move() {
+        sql.execute('select AXH_MovePointRandom(), '+Math.random());
+        setTimeout(move, 3000)
+      }
+      function main() {
+        sql = new cartodb.SQL({ user: 'viz2' });
+        cartodb.createVis('map', 'http://viz2.cartodb.com/api/v2/viz/4a706fa0-f83a-11e2-bde0-5404a6a683d5/viz.json', {zoom: 10, tiles_loader: true})
+        .done(function(vis, layers) {
+          map = vis.getNativeMap();
+          layer = layers[1];
+          refresh();
+          move();
+          center();
+        })
+        .error(function(err) {
+          console.log(err);
+        });
+        
+      }
+
+      window.onload = main;
+    </script>
+  </body>
+</html>
