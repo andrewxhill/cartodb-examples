@@ -1,0 +1,10 @@
+/* Here are the styles that makes the template responsive */
+
+@media only screen and (max-width: 768px) {
+  .map{position: inherit; height: 400px; width: 100%; display: block;}
+  .sidepanel{position: inherit; width: 100%;}
+}
+
+@media only screen and (max-width: 480px) {
+  .map {height: 300px;}
+}

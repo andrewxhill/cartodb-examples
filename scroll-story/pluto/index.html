@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--Edit the title of the page-->
+    <title>PLUTO Data Tour</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Goblin+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+    <![endif]-->
+    <!--Switch between the different themes changing the stylesheet below - light-theme.css |dark-theme.css -->
+    <link rel="stylesheet" href="css/pluto-theme.css">
+    <link rel="stylesheet" href="css/makeitresponsive.css">
+  </head>
+  <body>
+
+    <div class="map" id="map"></div>
+
+    <div class="sidepanel">
+      <div class="wrapper">
+        <div class="context subheader">
+          <p>maps created by <a href="http://twitter.com/andrewxhill">@andrewxhill</a> on <a href="http://cartodb.com">cartodb</a></p>
+        </div>
+        <h1 id="headline"><i>Epic win for NYC’s Open Data Community! PLUTO is free!</i></h1>
+        <div id="info">
+            <p>
+                Many thanks to advocates inside and outside who worked tirelessly for years to liberate one of New York City’s most fundamental datasets. Many more thanks to the efforts of Department of City Planning, DoITT, and the Chief Analytics Officer’s office. THANK YOU!
+            </p>
+            <p class='source'>
+                - <a href="http://codeforamerica.org/2013/07/25/epic-win-for-nycs-open-data-community-pluto-is-free/" target="_blank">CodeForAmerica.org</a>
+            </p>
+        </div>
+        <div class="context footer">
+        </div>
+      </div>
+      <div id="next-button">
+        <p><a id="next">skip</a></p>
+      </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&v=3.8"></script>
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.js"></script>
+    <!--Change the URL below in order to change the map that is being shown.
+    Go to your map in CartoDB, click on share, and copy the URL undert the API section
+    Check the cartodb.js documentation for more info
+    http://developers.cartodb.com/documentation/cartodb-js.html-->
+    <script type="text/javascript">
+      var last = 0;
+      var next = 0;
+      var pause = 12000;
+      var map = new L.Map('map', {
+        center: [40.73906330729812, -73.90],
+        zoom: 11
+      });
+      var nextTimer;
+
+      var move = function(){
+        if(last>-1){
+            if (tour[last]['layer']){
+                tour[last]['layer'].hide()
+            }
+            if (tour[next].xy != tour[last].xy){
+                map.panTo(tour[next].xy)
+            }
+            if (tour[next].z != map.getZoom()){
+                map.setZoom(tour[next].z)
+            }
+        }
+        $('#headline').html(tour[next].headline);
+        $('#info').html(tour[next].info);
+        if (tour[next]['layer']){
+            tour[next]['layer'].show()
+            last = next;
+            next+=1;
+            if (next == tour.length) next = 0;
+            nextTimer = setTimeout(move, pause);
+        } else {
+            cartodb.createLayer(map, tour[next].viz)
+                .addTo(map)
+                .on('done', function(layer) {
+                    if (tour[next].options){
+                        if (tour[next].options[0].query){
+                            layer.setQuery(tour[next].options[0].query)
+                        }
+                        if (tour[next].options[0].cartocss){
+                            layer.setCartoCSS(tour[next].options[0].cartocss)
+                        }
+                    }
+                    tour[next]['layer'] = layer;
+                    last = next;
+                    next+=1;
+                    if (next == tour.length) next = 0;
+                    nextTimer = setTimeout(move, pause);
+                })
+                .on('error',function(){        
+                    last = next;
+                    next+=1;
+                    if (next == tour.length) next = 0;
+                    nextTimer = setTimeout(move, 100);
+                });
+        }
+      }
+
+      var tour = [
+        {
+            headline: "<i>Epic win for NYC’s Open Data Community! PLUTO is free!</i>", 
+            info: "<p>Many thanks to advocates inside and outside who worked tirelessly for years to liberate one of New York City’s most fundamental datasets. Many more thanks to the efforts of Department of City Planning, DoITT, and the Chief Analytics Officer’s office. THANK YOU!</p><p class='source'>- <a href='http://codeforamerica.org/2013/07/25/epic-win-for-nycs-open-data-community-pluto-is-free/' target='_blank'>CodeForAmerica.org</a></p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/517e4222-fe11-11e2-b27e-6d88d9497914/viz.json", 
+            id: 1,
+            xy: [40.73906330729812, -73.90],
+            z: 11
+        },
+
+        {
+            headline: "So, what <i>is</i> PLUTO data exactly?", 
+            info: "<p>The PLUTO dataset contains highly detailed, tax lot level, data from the NYC Department of Finance Tax Map. It contains land use and geographic data about our city's five boroughs</p><p>As of today, the dataset contains <b>857,879</b> tax lots across New York City.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/728ea6bc-fe18-11e2-bc24-e7fa850f135c/viz.json", 
+            id: 1,
+            xy: [40.73906330729812, -73.90],
+            z: 11
+        },
+
+        {
+            headline: "Let's start digging into the geospatial profile of NYC", 
+            info: "<p>On the surface, PLUTO let's us look at simple characteristics of our city. For example, how much land in each borough is <i>City Owned</i>?</p><p>In this map, we can see city owned land throughout NYC. In total, it is about <b>150 square kilometers</b></p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/3cb7238a-fe1c-11e2-98df-152134ef8509/viz.json", 
+            id: 1,
+            xy: [40.73906330729812, -73.90],
+            z: 11
+        },
+
+        {
+            headline: "When were current buildings of New York built?", 
+            info: "<p class='mega'>Pre-1800</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/31d417f8-fe20-11e2-a82d-df8800d887e9/viz.json", 
+            id: 1,
+            xy: [40.73906330729812, -73.90],
+            z: 11
+        },
+
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1800-1900</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1800][yearbuilt<1900]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1900-1920</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1900][yearbuilt<1920]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1920-1940</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1920][yearbuilt<1940]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1940-1960</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1940][yearbuilt<1960]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1960-1980</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1960][yearbuilt<1980]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>1980-2000</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1980][yearbuilt<2000]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+        {
+            headline: "When were current buildings of lower Manhattan built?", 
+            info: "<p class='mega'>2000+</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=2000]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+
+        {
+            headline: "Who owns the private land of Manhattan?", 
+            info: "<p >By area, <b>NYU</b> is 7th of private land holders. But by total number of parcels, they are 4th.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    // query: "SELECT * FROM mn_mappluto_13v1 WHERE ownername = 'NEW YORK UNIVERSITY'",
+                    cartocss: "#layer{polygon-fill: #ddd; [ownername='NEW YORK UNIVERSITY']{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.73006330729812, -73.99],
+            z: 15
+        },
+
+        {
+            headline: "Who owns the private land of Manhattan?", 
+            info: "<p >Three different <b>Columbia University</b> related groups (Trustees of Columbia, Columbia University, and Columbia Univ Tr City) hold a total of <b>36</b> parcels over <b>205,000 sq. meters</b>.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    // query: "SELECT * FROM mn_mappluto_13v1 WHERE ownername = 'NEW YORK UNIVERSITY'",
+                    cartocss: "#layer{polygon-fill: #ddd; [ownername='TRUSTEES OF COLUMBIA'],[ownername='COLUMBIA UNIVERSITY'],[ownername='COLUMBIA UNIV TR CITY']{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.836330729812, -73.95],
+            z: 13
+        },
+
+        {
+            headline: "Who owns the private land of Brooklyn?", 
+            info: "<p >Funny enough, as far as land classified as <i>private</i> ownership in Brooklyn, <b>New York City</b> is the primary holder, with 166 parcels and 2.7 million square meters. A similar story can be seen in the Bronx and Staten Island.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
+            options: [
+                {
+                    query: "SELECT *, CASE WHEN ownername ILIKE '%CITY OF NY%' or ownername ILIKE '%CITY OF NEW%'THEN true ELSE false END is_city FROM bk_mappluto_13v1",
+                    cartocss: "#layer{polygon-fill: #ddd; [is_city=TRUE]{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.66, -73.93],
+            z: 12
+        },
+
+        {
+            headline: "Who owns the private land of Queens?", 
+            info: "<p >The story is a bit different in Queens, where the largest land owner by FAR is, <b>MTA/LIRR</b>. </p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/4a335440-fbb8-11e2-8ac4-3f21906cb20f/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: #ddd; [ownername='MTA/LIRR']{polygon-fill:red}}"
+                }
+            ],
+            id: 1,
+            xy: [40.72, -73.84],
+            z: 12
+        },
+
+        {
+            headline: "Zoning in action: Where will Brooklyn remain short?", 
+            info: "<p >Although incomplete, here are the majority of tax lots that are affected by height restrictions in the zoning laws. Probably not the best blocks for a <a href='http://nychenge.com'>Brooklynhenge</a>.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill: red; [ltdheight=null]{polygon-fill:#ddd}}"
+                }
+            ],
+            id: 1,
+            xy: [40.69, -74],
+            z: 14
+        },
+
+      ]
+
+
+      // next = tour.length - 1;
+      next = 10;
+
+      move();
+
+      $('#next').click(function(){
+        clearTimeout(nextTimer);
+        move();
+      })
+    </script>
+
+  </body>
+      </html>
