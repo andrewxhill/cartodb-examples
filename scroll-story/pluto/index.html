@@ -51,10 +51,12 @@
     <script type="text/javascript">
       var last = 0;
       var next = 0;
-      var pause = 15000;
+      var pause = 40000;
       var map = new L.Map('map', {
         center: [40.73906330729812, -73.90],
-        zoom: 11
+        zoom: 11,
+        minZoom: 8,
+        maxZoom: 15
       });
       var nextTimer;
 
@@ -82,9 +84,11 @@
             cartodb.createLayer(map, tour[next].viz)
                 .addTo(map)
                 .on('done', function(layer) {
+                    // console.log(viz)
+                    // console.log(viz.getSubLayer(0))
                     if (tour[next].options){
-                        if (tour[next].options[0].query){
-                            layer.setQuery(tour[next].options[0].query)
+                        if (tour[next].options[0].sql){
+                            layer.setQuery(tour[next].options[0].sql)
                         }
                         if (tour[next].options[0].cartocss){
                             layer.setCartoCSS(tour[next].options[0].cartocss)
@@ -116,8 +120,8 @@
         },
 
         {
-            headline: "So, what <i>is</i> PLUTO data exactly?", 
-            info: "<p>The PLUTO dataset contains highly detailed, tax lot level, data from the NYC Department of Finance Tax Map. It contains land use and geographic data about our city's five boroughs</p><p>As of today, the dataset contains <b>857,879</b> tax lots across New York City.</p>", 
+            headline: "What <i>is</i> PLUTO data exactly?", 
+            info: "<p>The PLUTO dataset contains tax lot level data from the NYC Department of Finance Tax Map. It contains land use and geographic data about our city's five boroughs</p><p>As of today, the dataset contains <b>857,879</b> tax lots across New York City.</p>", 
             viz: "http://pluto.cartodb.com/api/v2/viz/728ea6bc-fe18-11e2-bc24-e7fa850f135c/viz.json", 
             id: 1,
             xy: [40.73906330729812, -73.90],
@@ -134,6 +138,15 @@
         },
 
         {
+            headline: "Assuming # floors = height of building", 
+            info: "<p >How tall is the skyline of New York City? Here you can see all the peaks and valleys of the city. </p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/31d417f8-fe20-11e2-a82d-df8800d887e9/viz.json", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/0cd08e80-fee5-11e2-8888-ddc4604a078e/viz.json", 
+            id: 1,
+            xy: [40.74059136642329, -73.964233398438],
+            z: 13
+        },
+        {
             headline: "When were current buildings of New York built?", 
             info: "<p class='mega'>Pre-1800</p>", 
             viz: "http://pluto.cartodb.com/api/v2/viz/31d417f8-fe20-11e2-a82d-df8800d887e9/viz.json", 
@@ -148,7 +161,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1800][yearbuilt<1900]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1800][yearbuilt<1900]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -162,7 +175,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1900][yearbuilt<1920]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1900][yearbuilt<1920]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -175,7 +188,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1920][yearbuilt<1940]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1920][yearbuilt<1940]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -188,7 +201,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1940][yearbuilt<1960]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1940][yearbuilt<1960]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -201,7 +214,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1960][yearbuilt<1980]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1960][yearbuilt<1980]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -214,7 +227,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=1980][yearbuilt<2000]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=1980][yearbuilt<2000]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -227,7 +240,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [yearbuilt>=2000]{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [yearbuilt>=2000]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -242,7 +255,7 @@
             options: [
                 {
                     // query: "SELECT * FROM mn_mappluto_13v1 WHERE ownername = 'NEW YORK UNIVERSITY'",
-                    cartocss: "#layer{polygon-fill: #ddd; [ownername='NEW YORK UNIVERSITY']{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [ownername='NEW YORK UNIVERSITY']{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -257,7 +270,7 @@
             options: [
                 {
                     // query: "SELECT * FROM mn_mappluto_13v1 WHERE ownername = 'NEW YORK UNIVERSITY'",
-                    cartocss: "#layer{polygon-fill: #ddd; [ownername='TRUSTEES OF COLUMBIA'],[ownername='COLUMBIA UNIVERSITY'],[ownername='COLUMBIA UNIV TR CITY']{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [ownername='TRUSTEES OF COLUMBIA'],[ownername='COLUMBIA UNIVERSITY'],[ownername='COLUMBIA UNIV TR CITY']{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -267,12 +280,12 @@
 
         {
             headline: "Who owns the private land of Brooklyn?", 
-            info: "<p >Funny enough, as far as land classified as <i>private</i> ownership in Brooklyn, <b>New York City</b> is the primary holder, with 166 parcels and 2.7 million square meters. A similar story can be seen in the Bronx and Staten Island.</p>", 
+            info: "<p >Funny enough, as far as land classified as <i>private</i> ownership in Brooklyn, <b>New York City</b> is the primary holder, with 166 parcels and 2.7 million square meters. Similar stories can be found in the Bronx and Staten Island.</p>", 
             viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
             options: [
                 {
-                    query: "SELECT *, CASE WHEN ownername ILIKE '%CITY OF NY%' or ownername ILIKE '%CITY OF NEW%'THEN true ELSE false END is_city FROM bk_mappluto_13v1",
-                    cartocss: "#layer{polygon-fill: #ddd; [is_city=TRUE]{polygon-fill:red}}"
+                    sql: "SELECT *, CASE WHEN ownername ILIKE '%CITY OF NY%' or ownername ILIKE '%CITY OF NEW%'THEN true ELSE false END is_city FROM bk_mappluto_13v1",
+                    cartocss: "#layer{polygon-fill: #ccc; [is_city=TRUE]{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -286,7 +299,7 @@
             viz: "http://pluto.cartodb.com/api/v2/viz/4a335440-fbb8-11e2-8ac4-3f21906cb20f/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: #ddd; [ownername='MTA/LIRR']{polygon-fill:red}}"
+                    cartocss: "#layer{polygon-fill: #ccc; [ownername='MTA/LIRR']{polygon-fill:red}}"
                 }
             ],
             id: 1,
@@ -296,11 +309,11 @@
 
         {
             headline: "Zoning in action: Where will Brooklyn remain short?", 
-            info: "<p >Although incomplete, here are the majority of tax lots that are affected by height restrictions in the zoning laws. Probably not the best blocks for a <a href='http://nychenge.com'>Brooklynhenge</a>.</p>", 
+            info: "<p >Here is a large cluster of tax lots that are affected by height restrictions in the zoning laws. Probably not the best blocks for a <a href='http://nychenge.com'>Brooklynhenge</a>.</p>", 
             viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
             options: [
                 {
-                    cartocss: "#layer{polygon-fill: red; [ltdheight=null]{polygon-fill:#ddd}}"
+                    cartocss: "#layer{polygon-fill: red; [ltdheight=null]{polygon-fill:#ccc}}"
                 }
             ],
             id: 1,
@@ -308,11 +321,128 @@
             z: 14
         },
 
+        {
+            headline: "Zoning in action: Don't block my view!", 
+            info: "<p>Related laws apply to this cluster of buildings along the east side of Central Park. Still, no clear pattern in where the tallest (more red) buildings are in the cluster.", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{[ numfloors <= 50.0] {polygon-fill: #B10026;}[ numfloors <= 32.0] {polygon-fill: #E31A1C;}[ numfloors <= 26.0] {polygon-fill: #FC4E2A;}[ numfloors <= 20.0] {polygon-fill: #FD8D3C;}[ numfloors <= 14.0] {polygon-fill: #FEB24C;}[ numfloors <= 8] {polygon-fill: #FED976;}[ numfloors <= 4] {polygon-fill: #FFFFB2;}[ltdheight=null]{polygon-fill:#ccc}}"
+                }
+            ],
+            id: 1,
+            xy: [40.774, -73.965],
+            z: 15
+        },
+
+        {
+            headline: "NYC Stair Master", 
+            info: "<p ><i>there can only be one</i><br/><br/>Where are people walking up the most flights of stairs in the NYC walk-ups? I've lived in a 6er, apparently there are a dozen with more than 10!</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill:#ccc;    polygon-opacity: 0.7;    line-opacity:0;    line-color: #FFFFFF; [landuse='02']{ [ numfloors <= 100.0] {polygon-fill: #E31A1C;}[ numfloors <= 5.0] {polygon-fill: #FC4E2A;}[ numfloors <= 4.0] {polygon-fill: #FD8D3C;}[ numfloors <= 3.0] {polygon-fill: #FEB24C;}[ numfloors <= 2] {polygon-fill: #FED976;}[ numfloors <= 1]{polygon-fill: #FFFFB2;} }}"
+                }
+            ],
+            id: 1,
+            xy: [40.7406330729812, -73.99],
+            z: 13
+        },
+
+        {
+            headline: "NYC Stair Master", 
+            info: "<p ><i>there can only be one</i><br/><br/>But then there is apparently this building, which is classified as <i>Multi-family walk-up</i> and is <b>16 floors</b> tall!. Uhm...</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    cartocss: "#layer{polygon-fill:#ccc;    polygon-opacity: 0.7;    line-opacity:0;    line-color: #FFFFFF; [landuse='02']{ [ numfloors <= 100.0] {polygon-fill: #E31A1C;}[ numfloors <= 5.0] {polygon-fill: #FC4E2A;}[ numfloors <= 4.0] {polygon-fill: #FD8D3C;}[ numfloors <= 3.0] {polygon-fill: #FEB24C;}[ numfloors <= 2] {polygon-fill: #FED976;}[ numfloors <= 1]{polygon-fill: #FFFFB2;} }} #circle::over [landuse='02'][numfloors>15]{ marker-fill: transparent; marker-width: 24; marker-line-color: green; marker-line-width: 6; marker-line-opacity: 0.9; marker-type: ellipse;marker-allow-overlap: true;}"
+                }
+            ],
+            id: 1,
+            xy: [40.776330729812, -73.97],
+            z: 14
+        },
+
+        {
+            headline: "Which lots are the farthest from public spaces?", 
+            info: "<p>Here is an interesting question I have fumbled around with a few times but could be fun to look at more deeply: <i>where aren't there public spaces?</i> Let's take a look in <b>Manhattan</b>... <i>(don't mind the funny way it can't find central park)</i>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e21b7338-fbb7-11e2-a0ed-7128c9850036/viz.json", 
+            options: [
+                {
+                    sql: "SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(ST_Envelope(the_geom), ST_Centroid(m.the_geom)) FROM mn_mappluto_13v1 WHERE landuse = '09' ORDER BY the_geom <-> m.the_geom LIMIT 1) as d, landuse FROM mn_mappluto_13v1 m",
+                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green;polygon-opacity: 0.5;}}"
+                }
+            ],
+            id: 1,
+            xy: [40.774, -73.965],
+            z: 13
+        },
+
+        {
+            headline: "Which lots are the farthest from public spaces?", 
+            info: "<p>Here is an interesting question I have fumbled around with a few times but could be fun to look at more deeply: <i>where aren't there public spaces?</i> Let's take a look in <b>Brooklyn</b>...", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
+            options: [
+                {
+                    sql: "WITH g AS (SELECT ST_Union(ST_Envelope(the_geom)) as the_geom FROM bk_mappluto_13v1 WHERE landuse = '09') SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(the_geom, ST_Centroid(m.the_geom)) FROM g ORDER BY the_geom <-> ST_Centroid(m.the_geom) LIMIT 1) as d, landuse FROM bk_mappluto_13v1 m",
+                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green; polygon-opacity: 0.5;}}"
+                }
+            ],
+            id: 1,
+            xy: [40.66, -73.93],
+            z: 12
+        },
+
+        {
+            headline: "Which lots are the farthest from public spaces?", 
+            info: "<p>Here is an interesting question I have fumbled around with a few times but could be fun to look at more deeply: <i>where aren't there public spaces?</i> Let's take a look in <b>Queens</b>...", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/4a335440-fbb8-11e2-8ac4-3f21906cb20f/viz.json", 
+            options: [
+                {
+                    sql: "WITH g AS (SELECT ST_Union(ST_Envelope(the_geom)) as the_geom FROM qn_mappluto_13v1 WHERE landuse = '09') SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(the_geom, ST_Centroid(m.the_geom)) FROM g ORDER BY the_geom <-> ST_Centroid(m.the_geom) LIMIT 1) as d, landuse FROM qn_mappluto_13v1 m",
+                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green;polygon-opacity: 0.5;}}"
+                }
+            ],
+            id: 1,
+            xy: [40.72, -73.84],
+            z: 12
+        },
+
+        {
+            headline: "Which lots are the farthest from public spaces?", 
+            info: "<p>Here is an interesting question I have fumbled around with a few times but could be fun to look at more deeply: <i>where aren't there public spaces?</i> Let's take a look in <b>Bronx</b>...", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/19652da8-fbb7-11e2-a75b-6139856afd6d/viz.json", 
+            options: [
+                {
+                    sql: "WITH g AS (SELECT ST_Union(ST_Envelope(the_geom)) as the_geom FROM bx_mappluto_13v1 WHERE landuse = '09') SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(the_geom, ST_Centroid(m.the_geom)) FROM g ORDER BY the_geom <-> ST_Centroid(m.the_geom) LIMIT 1) as d, landuse FROM bx_mappluto_13v1 m",
+                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green;polygon-opacity: 0.5;}}"
+                }
+            ],
+            id: 1,
+            xy: [40.85890355725105, -73.85765075683594],
+            z: 13
+        },
+
+        {
+            headline: "Which lots are the farthest from public spaces?", 
+            info: "<p>Here is an interesting question I have fumbled around with a few times but could be fun to look at more deeply: <i>where aren't there public spaces?</i> Let's take a look in <b>Staten Island</b>...", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/5c8e6b3e-fbb8-11e2-a9af-619e94a2c50b/viz.json", 
+            options: [
+                {
+                    sql: "WITH g AS (SELECT ST_Union(ST_Envelope(the_geom)) as the_geom FROM si_mappluto_13v1 WHERE landuse = '09') SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(the_geom, ST_Centroid(m.the_geom)) FROM g ORDER BY the_geom <-> ST_Centroid(m.the_geom) LIMIT 1) as d, landuse FROM si_mappluto_13v1 m",
+                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green;polygon-opacity: 0.5;}}"
+                }
+            ],
+            id: 1,
+            xy: [40.59, -74.15],
+            z: 12
+        }
+
       ]
 
 
       // next = tour.length - 1;
-      // next = 10;
+      // next = 18;
 
       move();
 
