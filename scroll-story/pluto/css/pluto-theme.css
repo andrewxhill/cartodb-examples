@@ -3,7 +3,7 @@
 body{font-family: 'Goblin One', cursive; font-weight: regular; font-size: 15px; color: #000; background-color: white; margin: 0;}
 h1{font-weight: bold; text-transform: uppercase; font-size: 41px; letter-spacing: -1px; color: #000; line-height: 43px;}
 h3{font-weight: bold; font-size: 12px; color: #000; text-transform: uppercase; margin: 18px 0 0 0;}
-p{margin: 8px 0 20px 0; line-height: 21px;}
+p{margin: 8px 0 20px 0; line-height: 21px; ;}
 p.source {text-align: right;}
 p.mega{font-size: 100px; line-height: 110px;}
 b {color: black; font-size: 1.35em;}
@@ -22,8 +22,8 @@ a:hover{text-decoration: underline;}
 	background-image: -webkit-linear-gradient(left, rgba(255,255,255,0.0001) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 50%);
 }
 
-.context{font-family: 'Goblin One', cursive; font-size: 13px; color: #000; padding: 20px 0 0 0;}
-.subheader{font-size: 0.75em; margin-bottom: 80px; line-height: 10px; text-align: right; float: right;}
+/*.context{width: 100%; font-family: 'Goblin One', cursive; font-size: 13px; color: #000; padding: 20px 0 0 0;}*/
+.context.subheader{font-size: 0.75em; margin-bottom: 80px; line-height: 10px; text-align: right; }
 .footer{margin-top: 10px; font-size: 0.75em; line-height: 10px; text-align: right; float: right; cursor: pointer;}
 .titleBlock{text-align: right;}
 #next-button{position: absolute; position: absolute; bottom: 10px; right: 20px; font-size: 0.7em; cursor: pointer;}

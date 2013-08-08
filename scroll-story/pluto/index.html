@@ -51,7 +51,7 @@
     <script type="text/javascript">
       var last = 0;
       var next = 0;
-      var pause = 40000;
+      var pause = 45000;
       var map = new L.Map('map', {
         center: [40.73906330729812, -73.90],
         zoom: 11,
@@ -140,12 +140,29 @@
         {
             headline: "Assuming # floors = height of building", 
             info: "<p >How tall is the skyline of New York City? Here you can see all the peaks and valleys of the city. </p>", 
-            viz: "http://pluto.cartodb.com/api/v2/viz/31d417f8-fe20-11e2-a82d-df8800d887e9/viz.json", 
             viz: "http://pluto.cartodb.com/api/v2/viz/0cd08e80-fee5-11e2-8888-ddc4604a078e/viz.json", 
             id: 1,
             xy: [40.74059136642329, -73.964233398438],
             z: 13
         },
+        {
+            headline: "Assuming # floors = height of building", 
+            info: "<p >How tall is the skyline of New York City? Here you can see all the peaks and valleys of the city. </p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/bf4dacd4-003c-11e3-aaf8-a9294e572fad/viz.json", 
+            id: 1,
+            xy: [40.76401504612403, -73.97571086883545],
+            z: 14
+        },
+
+        {
+            headline: "How many residential units per tax lot?", 
+            info: "<p>In this visualization, you can take a look into how many units each tax lot contains. Of course, we can't fit all of them on a single map, but play with it online to zoom and dive into small neighborhoods.</p>", 
+            viz: "http://pluto.cartodb.com/api/v2/viz/e92a19b4-ff03-11e2-8e44-41be34777ef9/viz.json", 
+            id: 1,
+            xy: [40.73906330729812, -73.90],
+            z: 11
+        },
+        
         {
             headline: "When were current buildings of New York built?", 
             info: "<p class='mega'>Pre-1800</p>", 
@@ -435,28 +452,6 @@
             ],
             id: 1,
             xy: [40.59, -74.15],
-            z: 12
-        },
-        {
-            headline: "How many residential units per tax lot?", 
-            info: "<p>In this visualization, you can take a look into how many units each tax lot contains. Of course, we can't fit all of them on a single map, but play with it online to zoom and dive into small neighborhoods.</p>", 
-            viz: "http://pluto.cartodb.com/api/v2/viz/e92a19b4-ff03-11e2-8e44-41be34777ef9/viz.json", 
-            id: 1,
-            xy: [40.73906330729812, -73.90],
-            z: 11
-        },
-        {
-            headline: "<i>Brooklyn is full of strollers...</i>", 
-            info: "<p>i live there so I can say that<br/><br/>But if you live in Brooklyn and kids, you probably want to live close to a playground, here are all residential units linked to their closest playground.</p>", 
-            viz: "http://pluto.cartodb.com/api/v2/viz/09adeda4-fbb8-11e2-9ea5-15cfc813f31e/viz.json", 
-            options: [
-                {
-                    sql: "WITH g AS (SELECT ST_Union(ST_Envelope(the_geom)) as the_geom FROM bk_mappluto_13v1 WHERE landuse = '09') SELECT 1 as cartodb_id, the_geom, the_geom_webmercator, (SELECT st_distance(the_geom, ST_Centroid(m.the_geom)) FROM g ORDER BY the_geom <-> ST_Centroid(m.the_geom) LIMIT 1) as d, landuse FROM bk_mappluto_13v1 m",
-                    cartocss: "#layer{line-color: #FFF;line-opacity: 1;line-width: 1;polygon-opacity: 1;[ d <= 0.011] {polygon-fill: #B10026;}[ d <= 0.01] {polygon-fill: #E31A1C;}[ d <= 0.009] {polygon-fill: #FC4E2A;}[ d <= 0.008] {polygon-fill: #FD8D3C;}[ d <= 0.007] {polygon-fill: #FEB24C;}[ d <= 0.006] {polygon-fill: #FED976;}[ d <= 0.005] {polygon-fill: #eee;}[ landuse='09'] {polygon-fill: green; polygon-opacity: 0.5;}}"
-                }
-            ],
-            id: 1,
-            xy: [40.66, -73.93],
             z: 12
         }
 
