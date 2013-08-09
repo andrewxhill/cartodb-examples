@@ -15,6 +15,14 @@
     <!--Switch between the different themes changing the stylesheet below - light-theme.css |dark-theme.css -->
     <link rel="stylesheet" href="css/pluto-theme.css">
     <link rel="stylesheet" href="css/makeitresponsive.css">
+    <style>
+      div.cartodb-tiles-loader{
+        position: absolute;
+        left: 43px;
+        top: -10px;
+
+      }
+    </style>
   </head>
   <body>
 
@@ -60,6 +68,8 @@
       });
       var nextTimer;
       var running = false;
+      var loader = new cdb.geo.ui.TilesLoader({ template: function(){ return '<div class="loader"></div>' } });
+      $('#map').append(loader.render().el);
 
       var move = function(){
         if(tour[last]){
@@ -79,6 +89,12 @@
 
         window.location.hash = "#"+next;  
 
+        function addLoader(layer) {
+          layer.bind('loading', function() { loader.show() });
+          layer.bind('load',  function() { loader.hide(); });
+        }
+
+
         if (tour[next]['layer']){
             tour[next]['layer'].show()
             last = next;
@@ -89,6 +105,7 @@
             cartodb.createLayer(map, tour[next].viz)
                 .addTo(map)
                 .on('done', function(layer) {
+                    addLoader(layer);
                     // console.log(viz)
                     // console.log(viz.getSubLayer(0))
                     if (tour[next].options){
