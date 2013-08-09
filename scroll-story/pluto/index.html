@@ -60,6 +60,7 @@
       });
       var nextTimer;
 
+
       var move = function(){
         if(last>-1){
             if (tour[last]['layer']){
@@ -74,6 +75,9 @@
         }
         $('#headline').html(tour[next].headline);
         $('#info').html(tour[next].info);
+
+        window.location.hash = "#"+next;  
+        
         if (tour[next]['layer']){
             tour[next]['layer'].show()
             last = next;
@@ -457,9 +461,15 @@
 
       ]
 
-
-      // next = tour.length - 1;
-      // next = 18;
+      if(window.location.hash) {
+        var hash_value = window.location.hash.replace('#', '');
+         if (hash_value > 0) {
+             if (hash_value < tour.length) {
+                next = hash_value
+             }
+         }
+         
+     }
 
       move();
 
