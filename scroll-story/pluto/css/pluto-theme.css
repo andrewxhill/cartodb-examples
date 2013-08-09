@@ -26,4 +26,5 @@ a:hover{text-decoration: underline;}
 .context.subheader{font-size: 0.75em; margin-bottom: 80px; line-height: 10px; text-align: right; }
 .footer{margin-top: 10px; font-size: 0.75em; line-height: 10px; text-align: right; float: right; cursor: pointer;}
 .titleBlock{text-align: right;}
+#back-button{position: absolute; position: absolute; bottom: 10px; right: 80px; font-size: 0.7em; cursor: pointer;}
 #next-button{position: absolute; position: absolute; bottom: 10px; right: 20px; font-size: 0.7em; cursor: pointer;}

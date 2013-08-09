@@ -37,6 +37,9 @@
         <div class="context footer">
         </div>
       </div>
+      <div id="back-button">
+        <a id="back">back</a></p>
+      </div>
       <div id="next-button">
         <a id="next">next</a></p>
       </div>
@@ -478,7 +481,17 @@
       $('#next').click(function(){
         clearTimeout(nextTimer);
         move();
-      })
+      });
+
+      $('#back').click(function(){
+        console.log(next)
+        clearTimeout(nextTimer);
+        if (next==0) next = tour.length;
+        next = next-2;
+        if (next<0) next = tour.length-1;
+        move();
+      });
+
     </script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
