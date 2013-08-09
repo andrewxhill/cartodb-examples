@@ -1,11 +1,11 @@
-/* Change the styles below in order to customize your template */
 
-body{font-family: 'Goblin One', cursive; font-weight: regular; font-size: 15px; color: #000; background-color: white; margin: 0;}
-h1{font-weight: bold; text-transform: uppercase; font-size: 41px; letter-spacing: -1px; color: #000; line-height: 43px;}
+
+body{font-family:normal "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: regular; font-size: 22px; color: #000; background-color: white; margin: 0;}
+h1{font-weight: bold; text-transform: uppercase; font-size: 46px; letter-spacing: -1px; color: #000; line-height: 48px;}
 h3{font-weight: bold; font-size: 12px; color: #000; text-transform: uppercase; margin: 18px 0 0 0;}
-p{margin: 8px 0 20px 0; line-height: 21px; ;}
+p{margin: 8px 0 20px 0; line-height: 25px; ;}
 p.source {text-align: right;}
-p.mega{font-size: 100px; line-height: 110px;}
+p.mega{font-size: 70px; line-height: 74px;}
 b {color: black; font-size: 1.35em;}
 a, a:visited{color: #3f85c2; text-decoration: none;}
 a:hover{text-decoration: underline;}
