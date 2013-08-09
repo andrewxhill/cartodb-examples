@@ -68,6 +68,8 @@
       });
       var nextTimer;
       var running = false;
+      var loader = new cdb.geo.ui.TilesLoader({ template: function(){ return '<div class="loader"></div>' } });
+      $('#map').append(loader.render().el);
 
       var move = function(){
         if(tour[last]){
@@ -88,12 +90,8 @@
         window.location.hash = "#"+next;  
 
         function addLoader(layer) {
-          var loader = new cdb.geo.ui.TilesLoader({ template: function(){ return '<div class="loader"></div>' } });
           layer.bind('loading', function() { loader.show() });
-          layer.bind('load',  function() { 
-              loader.hide(); 
-          });
-          $('#map').append(loader.render().el);
+          layer.bind('load',  function() { loader.hide(); });
         }
 
 
