@@ -62,7 +62,7 @@
       var running = false;
 
       var move = function(){
-        if(running){
+        if(last != -1){
             if (tour[last]['layer']){
                 tour[last]['layer'].hide()
             }
