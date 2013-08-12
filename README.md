@@ -8,7 +8,7 @@ These are maps I created to highlight the PLUTO data shortly after its release b
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/pluto/index.html)
 
- #### Scrolling stories with CartoDB templates and multiple maps
+#### Scrolling stories with CartoDB templates and multiple maps
 
 A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
 
