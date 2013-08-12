@@ -2,7 +2,13 @@
 
 Contact [@andrewxhill](http://twitter.com/andrewxhill)
 
-#### Scrolling stories with CartoDB templates and multiple maps
+#### CartoDB maps with slide layout
+
+These are maps I created to highlight the PLUTO data shortly after its release by the NYC government. It ended up being the first of my experiments to get a ton of press: [Gizmodo](http://gizmodo.com/see-nyc-from-a-new-angle-with-these-awesomely-nerdy-map-1093545954), [Visual.ly Blog](http://blog.visual.ly/visualizing-nycs-mappluto-database/), [AnimalNewYork](http://animalnewyork.com/2013/this-nyc-open-data-map-is-mind-bogglingly-comprehensive/), [Gothamist](http://gothamist.com/2013/08/10/geek_out_with_awesome_digital_maps.php), [Wired Maps Lab](http://www.wired.com/wiredscience/2013/08/nyc-pluto-data-map-party/), [Curbed](http://ny.curbed.com/archives/2013/08/09/boring_new_york_city_tax_data_makes_for_nonboring_maps.php), and [Brokelyn](http://brokelyn.com/new-project-takes-boring-tax-data-and-turns-it-into-cool-maps-about-nyc/)
+
+ - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/pluto/index.html)
+
+ #### Scrolling stories with CartoDB templates and multiple maps
 
 A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
 
