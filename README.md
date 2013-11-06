@@ -13,7 +13,8 @@ These are maps I created to highlight the PLUTO data shortly after its release b
 A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/basic/index.html)
- - Yea! This got a little love from [Wired](http://www.wired.com/wiredscience/2013/10/phone-map-game-new-york-city/
+
+Yea! This got a little love from [Wired](http://www.wired.com/wiredscience/2013/10/phone-map-game-new-york-city/)
 
 #### Sun position plus street orientation
 
