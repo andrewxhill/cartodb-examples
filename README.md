@@ -13,6 +13,7 @@ These are maps I created to highlight the PLUTO data shortly after its release b
 A summary of work I did at the NYPL historical map data hackathon. I just used a scrolling story layout to talk about the maps I created over an afternoon.
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/scroll-story/basic/index.html)
+ - Yea! This got a little love from [Wired](http://www.wired.com/wiredscience/2013/10/phone-map-game-new-york-city/
 
 #### Sun position plus street orientation
 
@@ -27,6 +28,8 @@ or taking a look at places where Manhattanhenge happens for any day of the year,
 see a couple of other cities,
 
  - [demo](http://andrewxhill.github.io/cartodb-examples/manhattanhenge/index.html)
+
+This was built into a full [fledged project](http://nychenge.com) that was run by [WNYC](http://www.wnyc.org/articles/wnyc-news/2013/jul/12/yes-manhattanhenge-also-park-slopehenge/)
 
 #### Share your private maps
 
