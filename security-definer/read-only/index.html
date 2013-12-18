@@ -84,14 +84,12 @@
             sublayers: [{
               sql: "SELECT * FROM AXHGroup_POI('"+$('#username').val()+"', '"+$('#secret').val()+"') x",
               cartocss: '#user_poi {marker-fill: #FF0000; marker-width: 5;}'
+            },{ //this layer is added to ensure invalidation based on our triggers
+              sql: "SELECT * FROM user_poi LIMIT 0",
+              cartocss: '#user_poi {marker-fill: #FF0000; marker-width: 5;}'
             }]
           }).done(function(layer) {
-            // add the layer to our map which already contains 1 sublayer
             map.addLayer(layer);
-            // change the query for the first layer
-            // layer.getSubLayer(0).setSQL('select * from european_countries_e where area > 10');
-
-            
             $('#openModal').remove();
           });
 

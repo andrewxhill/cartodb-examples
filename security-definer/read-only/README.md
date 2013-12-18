@@ -166,3 +166,6 @@ CREATE TRIGGER invalidate_user_poi_from_private_groups
 
 You can see my running app now on 
 
+[http://andrewxhill.com/cartodb-examples/security-definer/read-only/](http://andrewxhill.com/cartodb-examples/security-definer/read-only/)
+
+It creates a visualization from our empty dataset, then applies a query based on the username key pair provided on entry. 
