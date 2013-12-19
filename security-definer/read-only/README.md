@@ -8,7 +8,9 @@ This shows how to create a simple application using a security definer to access
 2. Remove any unwanted columns from private_user_list
 3. Run the following, 
 ```sql
-   ALTER TABLE private_user_list ADD COLUMN username text; ALTER TABLE private_user_list ADD COLUMN secret text; ALTER TABLE private_user_list ADD COLUMN group_id int
+   ALTER TABLE private_user_list ADD COLUMN username text; 
+   ALTER TABLE private_user_list ADD COLUMN secret text; 
+   ALTER TABLE private_user_list ADD COLUMN group_id int
 ```
 4. Populate the private_user_list with 3 users,
 ```sql
