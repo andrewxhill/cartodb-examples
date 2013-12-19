@@ -12,7 +12,12 @@ This shows how to create a simple application using a security definer to access
 ```
 4. Populate the private_user_list with 3 users,
 ```sql
-   INSERT into private_user_list (username, secret, group_id) VALUES ('bob', 'D7CAA28CE867A4A6DA2E510C7EDB4E7726C67720F6A6A93C9CE9D04DDB42E0BA', 1),('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC', 2),('henry', 'FCDFA03DB2822475B0FEB9622E0FBFFB3952F8ED99D78F9F6162CD224333D499', 2) 
+   INSERT into private_user_list 
+   (username, secret, group_id) 
+   VALUES
+   ('bob', 'D7CAA28CE867A4A6DA2E510C7EDB4E7726C67720F6A6A93C9CE9D04DDB42E0BA', 1),
+   ('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC', 2),
+   ('henry', 'FCDFA03DB2822475B0FEB9622E0FBFFB3952F8ED99D78F9F6162CD224333D499', 2) 
 ```
 
 ## Group Setup
@@ -27,7 +32,8 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 ```
 3. Add two new groups 
 ```sql 
-	INSERT INTO private_groups (group_id, description) VALUES (1, 'Management team'),(2, 'Sales team')
+   INSERT INTO private_groups (group_id, description) 
+   VALUES (1, 'Management team'),(2, 'Sales team')
 ```
 
 ## Create a table of private data
@@ -82,13 +88,13 @@ DECLARE
   val_list RECORD; 
 BEGIN
 
-  sql := 'SELECT group_id FROM private_user_list WHERE username ILIKE $1 AND secret = $2';
+  sql := 'SELECT group_id FROM private_user_list WHERE lower(username) = lower($1) AND secret = $2';
   EXECUTE sql using username, secret INTO group_info;
 
   IF group_info IS NULL THEN
     RAISE EXCEPTION 'Authorization failed for partner %', partner;
   END IF;
-  
+
   FOR val_list IN 
       SELECT * FROM private_poi WHERE group_info.group_id = ANY(group_id)
   LOOP 
