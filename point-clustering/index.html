@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leaflet multilayer example | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+    <![endif]-->
+
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.js"></script>
+
+  <script type="sql/html" id="sql_template">
+  WITH hgridA AS (SELECT CDB_HexagonGrid(ST_Expand(!bbox!, greatest(!pixel_width!,!pixel_height!) * 48), greatest(!pixel_width!,!pixel_height!) * 48) as cell),
+    bigs AS (SELECT * FROM (SELECT ST_Centroid(ST_Collect(i.the_geom_webmercator)) as the_geom_webmercator, count(i.cartodb_id) as points_count, 1 as cartodb_id, array_agg(cartodb_id) AS id_list FROM hgridA, (select * from tornados_copy) i where ST_Intersects(i.the_geom_webmercator, hgridA.cell) GROUP BY hgridA.cell) t WHERE points_count > 100 ),
+    hgridB AS (SELECT CDB_HexagonGrid(ST_Expand(!bbox!, greatest(!pixel_width!,!pixel_height!) * 36), greatest(!pixel_width!,!pixel_height!) * 36) as cell),
+    mids AS (SELECT * FROM (SELECT ST_Centroid(ST_Collect(i.the_geom_webmercator)) as the_geom_webmercator, count(i.cartodb_id) as points_count, 1 as cartodb_id, array_agg(cartodb_id) AS id_list FROM hgridB, (select * from tornados_copy) i where ST_Intersects(i.the_geom_webmercator, hgridB.cell) AND cartodb_id NOT IN (SELECT unnest(id_list) FROM bigs) GROUP BY hgridB.cell) t WHERE points_count > 25 ),
+    hgridC AS (SELECT CDB_HexagonGrid(ST_Expand(!bbox!, greatest(!pixel_width!,!pixel_height!) * 24), greatest(!pixel_width!,!pixel_height!) * 24) as cell),
+    smalls AS (SELECT * FROM (SELECT ST_Centroid(ST_Collect(i.the_geom_webmercator)) as the_geom_webmercator, count(i.cartodb_id) as points_count, 1 as cartodb_id, array_agg(cartodb_id) AS id_list FROM hgridC, (select * from tornados_copy) i where ST_Intersects(i.the_geom_webmercator, hgridC.cell) AND cartodb_id NOT IN (SELECT unnest(id_list) FROM bigs) AND cartodb_id NOT IN (SELECT unnest(id_list) FROM mids) GROUP BY hgridC.cell) t WHERE points_count > 5 )
+    SELECT the_geom_webmercator, 1 points_count, cartodb_id, ARRAY[cartodb_id], 'origin' as src FROM tornados_copy WHERE cartodb_id NOT IN (select unnest(id_list) FROM bigs) AND cartodb_id NOT IN (select unnest(id_list) FROM mids) AND cartodb_id NOT IN (select unnest(id_list) FROM smalls)
+    UNION ALL
+    SELECT *, 'bigs' as src FROM bigs
+    UNION ALL 
+    SELECT *, 'mids' as src FROM mids
+    UNION ALL 
+    SELECT *, 'smalls' as src FROM smalls
+  </script>
+
+    <script>
+
+      function main() {
+
+        // create leaflet map
+        var map = L.map('map', { 
+          zoomControl: false,
+          center: [35, -85],
+          zoom: 6
+        })
+
+        // add a base layer
+        L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+          attribution: 'Stamen'
+        }).addTo(map);
+
+        var baseSql = $('#sql_template').html();
+        
+        // add cartodb layer with one sublayer
+        cartodb.createLayer(map, {
+          user_name: 'andrew',
+          type: 'cartodb',
+          sublayers: [{
+             sql: baseSql,
+             cartocss: "#layer { text-size: 12; text-fill: red; text-name: [points_count]; text-face-name: 'DejaVu Sans Book'; text-halo-fill: #fff; text-halo-radius: 1; [src = 'mids'] {text-size: 36;} [src = 'smalls'] {text-size: 24; } [src = 'bigs'] { text-size: 48; } }"
+          }]
+        })
+        .addTo(map)
+        .done(function(layer) {
+        });
+
+
+      }
+
+      // you could use $(window).load(main);
+      window.onload = main; 
+
+    </script>
+
+  </body>
+</html>
