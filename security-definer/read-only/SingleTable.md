@@ -122,9 +122,9 @@ SELECT * FROM AXHGroup_POI('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499
 
 You should see a map of only points in France
 
-## Create a trigger
+## Create a public table to ensure cache invalidation
 
-This trigger will let us invalidate our empty table whenever our private table is updated. It will help us keep our visualization in sync even though our data isn't available in the public viz! A trick :)
+This table will simply be updated with a new timestamp anytime one of our privete tables is changed
 
 1. Go to the empty public table we created ```user_poi```
 2. Add a column called last_update type date
@@ -133,7 +133,13 @@ This trigger will let us invalidate our empty table whenever our private table i
 
     INSERT INTO public.user_poi (last_update) VALUES (now())
 ```
-4. Now we need to create a function that runs a similar SQL statement,
+
+## Create a trigger
+
+This trigger will let us invalidate our empty table whenever our private table is updated. It will help us keep our visualization in sync even though our data isn't available in the public viz! A trick :)
+
+Let's create a function to do the update of our public table,
+
 ```sql
 
 CREATE OR REPLACE FUNCTION AXHUpdate_Trigger()
@@ -163,8 +169,8 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 _This function updates a small public table ```user_poi``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [index.html](index.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
 
+Next let's add some triggers. First to private_poi,
 
-5. Add the trigger to our private_poi
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private
@@ -172,7 +178,9 @@ CREATE TRIGGER invalidate_user_poi_from_private
     FOR EACH STATEMENT
     EXECUTE PROCEDURE AXHUpdate_Trigger();
 ```
-6. Add the trigger to our user table
+
+Then our user table,
+
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private_user_list
@@ -180,7 +188,9 @@ CREATE TRIGGER invalidate_user_poi_from_private_user_list
     FOR EACH STATEMENT
     EXECUTE PROCEDURE AXHUpdate_Trigger();
 ```
-7. And our group table
+
+Finally our group table
+
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private_groups
