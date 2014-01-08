@@ -15,6 +15,7 @@ This shows how to create a simple application using a security definer to access
 ```
 4. Populate the private_user_list with 3 users,
 ```sql
+
    INSERT into private_user_list 
    (username, secret, group_id) 
    VALUES
