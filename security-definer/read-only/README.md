@@ -1,6 +1,6 @@
 ## Create private visualizations
 
-This will show you how to create visualizations with row-level control over which users can see what. There are two examples, a simple [SingleTable](SingleTable.md) example and then building on that a [MultiTable.md](MultiTable) example. They are just what they say, examples that have a single private table or multiple private tables that can be accessed by defined users with known keys. 
+This will show you how to create visualizations with row-level control over which users can see what. There are two examples, a simple [SingleTable](SingleTable.md) example and then building on that a [MultiTable](MultiTable.md) example. They are just what they say, examples that have a single private table or multiple private tables that can be accessed by defined users with known keys. 
 
 ## Features
 
