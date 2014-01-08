@@ -114,6 +114,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 1. Go to your map of private_poi
 2. Open the SQL editor and run
+
 ```sql
 
 SELECT * FROM AXHGroup_POI('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC')
