@@ -11,16 +11,7 @@ If you want to create maps from more than one private table we can easily modify
 
    ALTER TABLE private_data_tables ADD COLUMN tablename text; 
 ```
-4. Populate the private_user_list with 1 table,
-```sql
 
-   INSERT into private_data_tables 
-   (tablename) 
-   VALUES
-   ('private_poi') 
-```
-
-_1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 
 ## Add a trigger for private_data_tables
 
@@ -33,6 +24,19 @@ CREATE TRIGGER invalidate_user_poi_from_private_user_list
     FOR EACH STATEMENT
     EXECUTE PROCEDURE AXHUpdate_Trigger();
 ```
+
+## Populate the private_user_list with 1 table,
+
+```sql
+
+   INSERT into private_data_tables 
+   (tablename) 
+   VALUES
+   ('private_poi') 
+```
+
+_1 should be changed to pure SQL pending Ghost Table rake feature deploy_
+
 
 ## Update our security definer
 
