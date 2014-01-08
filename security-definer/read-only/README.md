@@ -4,7 +4,7 @@ This shows how to create a simple application using a security definer to access
 
 ## User Setup
 
-1. Create a private table called ```private_user_list``` 
+1. Create a private table called ```private_user_list``` *
 2. Remove any unwanted columns from private_user_list
 3. Run the following, 
 ```sql
@@ -22,11 +22,13 @@ This shows how to create a simple application using a security definer to access
    ('henry', 'FCDFA03DB2822475B0FEB9622E0FBFFB3952F8ED99D78F9F6162CD224333D499', 2) 
 ```
 
+_1 should be changed to pure SQL pending Ghost Table rake feature deploy_
+
 ## Group Setup
 
 You may have noticed that we assigned our users above to two groups, 1 and 2. These groups are where row level permissions are defined. Let's create the necessary table.
 
-1. Create a private table called ```private_groups```
+1. Create a private table called ```private_groups``` *
 2. Run the following to create the necessary columns,
 ```sql
 	ALTER TABLE private_groups ADD COLUMN group_id int; 
@@ -37,6 +39,8 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
    INSERT INTO private_groups (group_id, description) 
    VALUES (1, 'Management team'),(2, 'Sales team')
 ```
+
+_1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 
 ## Create a table of private data
 
@@ -68,15 +72,6 @@ You can check that it worked by opening your map of your private_poi and running
     select * from private_poi WHERE 2 = any(group_id)
 ```
 
-## Create a public visualization
-
-Now we should create a new table that is public and is empty.
-
-1. Create a new table
-2. Rename it, user_poi
-3. Make it public
-4. Create a visualization with it called, 'Group access to POI'
-
 ## Create our security definer
 
 ```sql
@@ -90,7 +85,7 @@ DECLARE
   val_list RECORD; 
 BEGIN
 
-  sql := 'SELECT group_id FROM private_user_list WHERE lower(username) = lower($1) AND secret = $2';
+  sql := 'SELECT group_id FROM public.private_user_list WHERE lower(username) = lower($1) AND secret = $2';
   EXECUTE sql using username, secret INTO group_info;
 
   IF group_info IS NULL THEN
@@ -98,7 +93,7 @@ BEGIN
   END IF;
 
   FOR val_list IN 
-      SELECT * FROM private_poi WHERE group_info.group_id = ANY(group_id)
+      SELECT * FROM public.private_poi WHERE group_info.group_id = ANY(group_id)
   LOOP 
     RETURN NEXT val_list; 
   END LOOP; 
@@ -125,7 +120,7 @@ This trigger will let us invalidate our empty table whenever our private table i
 2. Add a column called last_update type date
 3. Add a single row,
 ```sql
-    INSERT INTO user_poi (last_update) VALUES (now())
+    INSERT INTO public.user_poi (last_update) VALUES (now())
 ```
 4. Now we need to create a function that runs a similar SQL statement,
 
@@ -135,15 +130,31 @@ RETURNS trigger
 AS $$
 DECLARE
   sql text;
+  -- Ensure that the table name in single quotes below matches our table name
+  private_date_table text := 'private_poi';
 BEGIN
 
-  sql := 'UPDATE user_poi SET last_update = now()';
+  IF TG_TABLE_SCHEMA != 'public'
+    RAISE EXCEPTION 'Trigger originating from invalid source schema';
+  END IF;
+
+  IF TG_TABLE_NAME NOT IN (private_date_table, private_user_list, private_groups)
+    RAISE EXCEPTION 'Trigger originating from invalid source table';
+  END IF;
+
+  -- In the future, if we have multiple accounts on the same DB, 
+  -- we may need to limit the trigger to only specified TG_TABLE_NAME
+
+  sql := 'UPDATE public.user_poi SET last_update = now()';
   EXECUTE sql;
 
   RETURN NULL; 
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
+
+_This function updates a small public table ```user_poi``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [index.html](index.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
+
 
 5. Add the trigger to our private_poi
 
