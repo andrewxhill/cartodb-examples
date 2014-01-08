@@ -23,6 +23,18 @@ If you want to create maps from more than one private table we can easily modify
 
 _1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 
+## Add a trigger for private_table_updates
+
+This way you can invalidate caches if you add or remove datasets from your table list in private_data_tables.
+
+```sql
+
+CREATE TRIGGER invalidate_user_poi_from_private_user_list
+    AFTER INSERT OR UPDATE OR DELETE ON private_table_updates
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE AXHUpdate_Trigger();
+```
+
 ## Update our security definer
 
 ```sql
