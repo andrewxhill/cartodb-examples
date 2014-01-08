@@ -141,10 +141,7 @@ BEGIN
   IF TG_TABLE_NAME NOT IN (private_date_table, private_user_list, private_groups)
     RAISE EXCEPTION 'Trigger originating from invalid source table';
   END IF;
-
-  -- In the future, if we have multiple accounts on the same DB, 
-  -- we may need to limit the trigger to only specified TG_TABLE_NAME
-
+  
   sql := 'UPDATE public.user_poi SET last_update = now()';
   EXECUTE sql;
 
