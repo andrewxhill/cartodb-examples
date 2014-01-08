@@ -33,11 +33,13 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 1. Create a private table called ```private_groups``` *
 2. Run the following to create the necessary columns,
 ```sql
+
 	ALTER TABLE private_groups ADD COLUMN group_id int; 
 	ALTER TABLE private_groups ADD COLUMN description text; 
 ```
 3. Add two new groups 
 ```sql 
+
    INSERT INTO private_groups (group_id, description) 
    VALUES (1, 'Management team'),(2, 'Sales team')
 ```
@@ -51,6 +53,7 @@ _1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 3. Rename table to ```private_poi```
 4. Add a column for group_ids,
 ```sql
+
 	ALTER TABLE private_poi ADD COLUMN group_id INT[]
 ```
 
@@ -59,24 +62,28 @@ _1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 Here we are going to come up with a fake scheme for our mixed permission data. I'm going to say, everyone on the management team (group_id = 1) can see everything,
 
 ```sql
+
 	UPDATE private_poi SET group_id = '{1}'
 ```
 
 Next, we'll say that everyone on the sales team (group_id = 2) can only see cities in France
 
 ```sql
+
 	UPDATE private_poi SET group_id = array_append(group_id, 2) WHERE adm0name = 'France'
 ```
 
 You can check that it worked by opening your map of your private_poi and running the following,
 
 ```sql
+
     select * from private_poi WHERE 2 = any(group_id)
 ```
 
 ## Create our security definer
 
 ```sql
+
 CREATE OR REPLACE FUNCTION AXHGroup_POI(username text, secret text)
 RETURNS SETOF private_poi
 AS $$
@@ -109,6 +116,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 1. Go to your map of private_poi
 2. Open the SQL editor and run,
 ```sql
+
 SELECT * FROM AXHGroup_POI('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC')
 ```
 
@@ -122,11 +130,13 @@ This trigger will let us invalidate our empty table whenever our private table i
 2. Add a column called last_update type date
 3. Add a single row,
 ```sql
+
     INSERT INTO public.user_poi (last_update) VALUES (now())
 ```
 4. Now we need to create a function that runs a similar SQL statement,
 
 ```sql
+
 CREATE OR REPLACE FUNCTION AXHUpdate_Trigger()
 RETURNS trigger
 AS $$
@@ -160,6 +170,7 @@ _This function updates a small public table ```user_poi``` that we use in our ex
 5. Add the trigger to our private_poi
 
 ```sql
+
 CREATE TRIGGER invalidate_user_poi_from_private
     AFTER INSERT OR UPDATE OR DELETE ON private_poi
     FOR EACH STATEMENT
@@ -169,6 +180,7 @@ CREATE TRIGGER invalidate_user_poi_from_private
 6. Add the trigger to our user table
 
 ```sql
+
 CREATE TRIGGER invalidate_user_poi_from_private_user_list
     AFTER INSERT OR UPDATE OR DELETE ON private_user_list
     FOR EACH STATEMENT
@@ -178,6 +190,7 @@ CREATE TRIGGER invalidate_user_poi_from_private_user_list
 7. And our group table
 
 ```sql
+
 CREATE TRIGGER invalidate_user_poi_from_private_groups
     AFTER INSERT OR UPDATE OR DELETE ON private_groups
     FOR EACH STATEMENT
