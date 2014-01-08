@@ -118,6 +118,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 SELECT * FROM AXHGroup_POI('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC')
 ```
+
 You should see a map of only points in France
 
 ## Create a trigger
@@ -132,7 +133,6 @@ This trigger will let us invalidate our empty table whenever our private table i
     INSERT INTO public.user_poi (last_update) VALUES (now())
 ```
 4. Now we need to create a function that runs a similar SQL statement,
-
 ```sql
 
 CREATE OR REPLACE FUNCTION AXHUpdate_Trigger()
