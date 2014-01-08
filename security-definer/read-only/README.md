@@ -7,11 +7,13 @@ This shows how to create a simple application using a security definer to access
 1. Create a private table called ```private_user_list``` *
 2. Remove any unwanted columns from private_user_list
 3. Run the following, 
+
 ```sql
    ALTER TABLE private_user_list ADD COLUMN username text; 
    ALTER TABLE private_user_list ADD COLUMN secret text; 
    ALTER TABLE private_user_list ADD COLUMN group_id int
 ```
+
 4. Populate the private_user_list with 3 users,
 ```sql
    INSERT into private_user_list 
@@ -138,10 +140,12 @@ BEGIN
     RAISE EXCEPTION 'Trigger originating from invalid source schema';
   END IF;
 
-  IF TG_TABLE_NAME NOT IN (private_date_table, private_user_list, private_groups)
-    RAISE EXCEPTION 'Trigger originating from invalid source table';
-  END IF;
-  
+  -- for added security for your invalidation trigger, you can add an authenticated
+  -- list of tables where the trigger can originate from
+  -- IF TG_TABLE_NAME NOT IN (private_date_table, private_user_list, private_groups)
+  --   RAISE EXCEPTION 'Trigger originating from invalid source table';
+  -- END IF;
+
   sql := 'UPDATE public.user_poi SET last_update = now()';
   EXECUTE sql;
 
