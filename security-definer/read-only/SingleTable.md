@@ -165,7 +165,6 @@ _This function updates a small public table ```user_poi``` that we use in our ex
 
 
 5. Add the trigger to our private_poi
-
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private
@@ -173,9 +172,7 @@ CREATE TRIGGER invalidate_user_poi_from_private
     FOR EACH STATEMENT
     EXECUTE PROCEDURE AXHUpdate_Trigger();
 ```
-
 6. Add the trigger to our user table
-
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private_user_list
@@ -183,9 +180,7 @@ CREATE TRIGGER invalidate_user_poi_from_private_user_list
     FOR EACH STATEMENT
     EXECUTE PROCEDURE AXHUpdate_Trigger();
 ```
-
 7. And our group table
-
 ```sql
 
 CREATE TRIGGER invalidate_user_poi_from_private_groups
