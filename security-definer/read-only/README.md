@@ -13,7 +13,6 @@ This shows how to create a simple application using a security definer to access
    ALTER TABLE private_user_list ADD COLUMN secret text; 
    ALTER TABLE private_user_list ADD COLUMN group_id int
 ```
-
 4. Populate the private_user_list with 3 users,
 ```sql
    INSERT into private_user_list 
