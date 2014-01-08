@@ -89,7 +89,6 @@ RETURNS SETOF private_poi
 AS $$
 DECLARE
   sql text;
-  max_size float8;
   group_info RECORD;
   val_list RECORD; 
 BEGIN
@@ -142,8 +141,6 @@ RETURNS trigger
 AS $$
 DECLARE
   sql text;
-  -- Ensure that the table name in single quotes below matches our table name
-  private_date_table text := 'private_poi';
 BEGIN
 
   IF TG_TABLE_SCHEMA != 'public'
@@ -152,7 +149,7 @@ BEGIN
 
   -- for added security for your invalidation trigger, you can add an authenticated
   -- list of tables where the trigger can originate from
-  -- IF TG_TABLE_NAME NOT IN (private_date_table, private_user_list, private_groups)
+  -- IF TG_TABLE_NAME NOT IN ('private_poi', 'private_user_list', 'private_groups')
   --   RAISE EXCEPTION 'Trigger originating from invalid source table';
   -- END IF;
 
@@ -199,6 +196,6 @@ CREATE TRIGGER invalidate_user_poi_from_private_groups
 
 You can see my running app now on 
 
-[http://andrewxhill.com/cartodb-examples/security-definer/read-only/](http://andrewxhill.com/cartodb-examples/security-definer/read-only/)
+[http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html](http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html)
 
 It creates a visualization from our empty dataset, then applies a query based on the username key pair provided on entry. 
