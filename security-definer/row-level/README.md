@@ -167,7 +167,7 @@ END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
 
-_This function updates a small public table ```user_poi``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [row-level-security.html](row-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
+_This function updates a small public table ```user_poi``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [examples/row-level-security.html](row-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
 
 Next let's add some triggers. First to private_poi,
 
@@ -203,6 +203,6 @@ CREATE TRIGGER invalidate_user_poi_from_private_groups
 
 You can see my running app now on 
 
-[http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html](http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html)
+[http://andrewxhill.com/cartodb-examples/security-definer/row-level/examples/row-level-security.html](http://andrewxhill.com/cartodb-examples/security-definer/row-level/examples/row-level-security.html)
 
 It creates a visualization from our empty dataset, then applies a query based on the username key pair provided on entry. 

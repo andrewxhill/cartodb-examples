@@ -164,7 +164,7 @@ END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
 
-_This function updates a small public table ```public_table_cache``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [table-level-security.html](table-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
+_This function updates a small public table ```public_table_cache``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [table-level-security.html](examples/table-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
 
 Next let's add some triggers. First to my_private_table,
 
@@ -206,3 +206,10 @@ CREATE TRIGGER invalidate_public_table_cache_from_private_groups
     EXECUTE PROCEDURE AXHTableUpdate_Trigger();
 ```
 
+## See it live
+
+You can see my running app now on 
+
+[http://andrewxhill.com/cartodb-examples/security-definer/table-level/examples/table-level-security.html](http://andrewxhill.com/cartodb-examples/security-definer/table-level/examples/table-level-security.html)
+
+It creates a visualization from our empty dataset, then applies a query based on the username key pair provided on entry. 
