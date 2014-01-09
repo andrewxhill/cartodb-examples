@@ -7,41 +7,6 @@ If you want to create maps from more than one private table we can easily modify
 1. Dubplicate ```private_poi``` from the first tutorial
 2. Rename it to ```new_table_name```
 
-## Create a new private table to store all date tables for select access
-
-1. Create a private table called ```private_data_tables``` *
-2. Remove any unwanted columns from private_data_tables
-3. Run the following, 
-```sql
-
-   ALTER TABLE private_data_tables ADD COLUMN tablename text; 
-```
-
-
-## Add a trigger for private_data_tables
-
-This way you can invalidate caches if you add or remove datasets from your table list in private_data_tables.
-
-```sql
-
-CREATE TRIGGER invalidate_user_poi_from_private_user_list
-    AFTER INSERT OR UPDATE OR DELETE ON private_data_tables
-    FOR EACH STATEMENT
-    EXECUTE PROCEDURE AXHUpdate_Trigger();
-```
-
-## Populate the private_user_list with 1 table,
-
-```sql
-
-   INSERT into private_data_tables 
-   (tablename) 
-   VALUES
-   ('private_poi') 
-```
-
-_1 should be changed to pure SQL pending Ghost Table rake feature deploy_
-
 ## Create a new generic security checking function
 
 ```sql
@@ -84,8 +49,7 @@ You can now add any new private table with group defined data access to your acc
 
   UPDATE new_table_name SET group_id = '{1}'
 ```
-4. Add the tablename as a new row in your private_data_tables
-5. Add a new trigger to the table for public cache invalidation
+4. Add a new trigger to the table for public cache invalidation
 
 
 ## Add new function and trigger for each private table you add
