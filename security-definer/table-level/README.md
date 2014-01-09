@@ -46,12 +46,6 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 
 _1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 
-## Create a new private table
-
-1. Go to common data
-2. Import any dataset
-3. Rename the table to 'my_private_table'
-
 ## Permissions table
 
 You may have noticed that we assigned our users above to two groups, 1 and 2. These groups are where table level permissions are defined. Let's create the necessary table.
@@ -63,7 +57,47 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
   ALTER TABLE table_permissions ADD COLUMN tablename text; 
   ALTER TABLE table_permissions ADD COLUMN group_id INT[]
 ```
-3. Add permissions for a group to a private table 
+
+## Create a new generic security checking function
+
+```sql
+
+CREATE OR REPLACE FUNCTION AXHGroupCheck(tablename text, username text, secret text)
+RETURNS INT
+AS $$
+DECLARE
+  sql text;
+  table_id INT;
+  group_info RECORD;
+BEGIN
+
+  -- Check that our username and secret are valid
+  sql := 'SELECT group_id FROM public.private_user_list WHERE lower(username) = lower($1) AND secret = $2';
+  EXECUTE sql USING username, secret INTO group_info;
+
+  IF group_info IS NULL THEN
+    RAISE EXCEPTION 'Authorization failed for user %', username;
+  END IF;
+
+  -- Check that data is being requested from a valid table
+  sql := 'SELECT cartodb_id FROM public.table_permissions WHERE lower(tablename) = lower($1) AND $2 = ANY (group_id)';
+  EXECUTE sql USING tablename, group_info.group_id INTO table_id;
+
+  IF table_id IS NULL THEN
+    RAISE EXCEPTION 'Authorization failed for table %', tablename;
+  END IF;
+
+  RETURN group_info.group_id;
+END;
+$$ LANGUAGE 'plpgsql';
+```
+
+## Create a new private table
+
+1. Go to common data
+2. Import any dataset
+3. Rename the table to 'my_private_table'
+4. Add permissions for a group to a private table 
 ```sql 
 
    INSERT INTO table_permissions (tablename, group_id) 
@@ -74,40 +108,34 @@ This will give your "management team "(1) and "sales team" (2) as defined in Gro
 
 ## Create our security definer
 
+For each new table you add that you want to grant group-level permission to, you will need to create a new security definer. 
+
 ```sql
 
-CREATE OR REPLACE FUNCTION AXHGroup_Table(tablename text, username text, secret text)
-RETURNS SETOF private_poi
+CREATE OR REPLACE FUNCTION AXHMyPrivateTable(username text, secret text)
+RETURNS SETOF my_private_table
 AS $$
 DECLARE
   sql text;
   table_id INT;
-  group_info RECORD;
+  group_id INT;
   val_list RECORD; 
+  r record;
 BEGIN
 
-  -- Check that our username and secret are valid
-  sql := 'SELECT group_id FROM public.private_user_list WHERE lower(username) = lower($1) AND secret = $2';
-  EXECUTE sql USING username, secret INTO group_info;
+  group_id = AXHGroupCheck('my_private_table', username, secret);
 
-  IF group_info IS NULL THEN
-    RAISE EXCEPTION 'Authorization failed for partner: %', partner;
-  END IF;
+  sql := 'SELECT * FROM public.my_private_table';
 
-  -- Check that data is being requested from a valid table
-  sql := 'SELECT cartodb_id FROM public.table_permissions WHERE lower(tablename) = lower($1) AND $2 = ANY(group_id)';
-  EXECUTE sql USING tablename, group_info.group_id INTO table_id;
-
-  IF table_id IS NULL THEN
-    RAISE EXCEPTION 'Invalid source table: %', tablename;
-  END IF;
-
-  sql := 'SELECT * FROM public.'|| tablename;
-  FOR val_list IN EXECUTE sql
-  LOOP 
-    RETURN NEXT val_list; 
-  END LOOP; 
+  RETURN QUERY EXECUTE sql;
   RETURN; 
+  --EXECUTE sql INTO r;
+
+
+  --FOR val_list IN EXECUTE sql
+  --LOOP 
+  --  RETURN NEXT val_list; 
+  --END LOOP; 
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
