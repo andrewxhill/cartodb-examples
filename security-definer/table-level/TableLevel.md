@@ -34,8 +34,8 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 2. Run the following to create the necessary columns,
 ```sql
 
-	ALTER TABLE private_groups ADD COLUMN group_id int; 
-	ALTER TABLE private_groups ADD COLUMN description text; 
+  ALTER TABLE private_groups ADD COLUMN group_id int; 
+  ALTER TABLE private_groups ADD COLUMN description text; 
 ```
 3. Add two new groups 
 ```sql 
@@ -46,62 +46,64 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 
 _1 should be changed to pure SQL pending Ghost Table rake feature deploy_
 
-## Create a table of private data
+## Create a new private table
 
-1. Go to common data in your dashboard menu. 
-2. Import the table of populated places
-3. Rename table to ```private_poi```
-4. Add a column for group_ids,
+1. Go to common data
+2. Import any dataset
+3. Rename the table to 'my_private_table'
+
+## Permissions table
+
+You may have noticed that we assigned our users above to two groups, 1 and 2. These groups are where table level permissions are defined. Let's create the necessary table.
+
+1. Create a private table called ```table_permissions``` *
+2. Run the following to create the necessary columns,
 ```sql
 
-	ALTER TABLE private_poi ADD COLUMN group_id INT[]
+  ALTER TABLE table_permissions ADD COLUMN tablename text; 
+  ALTER TABLE table_permissions ADD COLUMN group_id INT[]
+```
+3. Add permissions for a group to a private table 
+```sql 
+
+   INSERT INTO table_permissions (tablename, group_id) 
+   VALUES ('my_private_table', {1, 2})
 ```
 
-## Add group_ids to our private_poi table
-
-Here we are going to come up with a fake scheme for our mixed permission data. I'm going to say, everyone on the management team (group_id = 1) can see everything,
-
-```sql
-
-	UPDATE private_poi SET group_id = '{1}'
-```
-
-Next, we'll say that everyone on the sales team (group_id = 2) can only see cities in France
-
-```sql
-
-	UPDATE private_poi SET group_id = array_append(group_id, 2) WHERE adm0name = 'France'
-```
-
-You can check that it worked by opening your map of your private_poi and running the following,
-
-```sql
-
-    select * from private_poi WHERE 2 = any(group_id)
-```
+This will give your "management team "(1) and "sales team" (2) as defined in Group Setup above, access to this full table.  
 
 ## Create our security definer
 
 ```sql
 
-CREATE OR REPLACE FUNCTION AXHGroup_POI(username text, secret text)
+CREATE OR REPLACE FUNCTION AXHGroup_Table(tablename text, username text, secret text)
 RETURNS SETOF private_poi
 AS $$
 DECLARE
   sql text;
+  table_id INT;
   group_info RECORD;
   val_list RECORD; 
 BEGIN
 
+  -- Check that our username and secret are valid
   sql := 'SELECT group_id FROM public.private_user_list WHERE lower(username) = lower($1) AND secret = $2';
-  EXECUTE sql using username, secret INTO group_info;
+  EXECUTE sql USING username, secret INTO group_info;
 
   IF group_info IS NULL THEN
-    RAISE EXCEPTION 'Authorization failed for partner %', partner;
+    RAISE EXCEPTION 'Authorization failed for partner: %', partner;
   END IF;
 
-  FOR val_list IN 
-      SELECT * FROM public.private_poi WHERE group_info.group_id = ANY(group_id)
+  -- Check that data is being requested from a valid table
+  sql := 'SELECT cartodb_id FROM public.table_permissions WHERE lower(tablename) = lower($1) AND $2 = ANY(group_id)'';
+  EXECUTE sql USING tablename, group_info.group_id INTO table_id;
+
+  IF table_id IS NULL THEN
+    RAISE EXCEPTION 'Invalid source table: %', tablename;
+  END IF;
+
+  sql := 'SELECT * FROM public.'|| tablename';
+  FOR val_list IN EXECUTE sql
   LOOP 
     RETURN NEXT val_list; 
   END LOOP; 
@@ -112,26 +114,27 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 ## Test the Security Definer
 
-1. Go to your map of private_poi
+1. Go to your map of my_private_table
 2. Open the SQL editor and run
 
 ```sql
 
-SELECT * FROM AXHGroup_POI('sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC')
+SELECT * FROM AXHGroup_Table('my_private_table', 'sally', '64FE9D79128C2BC31A777C2A8423AA2A6C79065B499BF081873FB04DAB61FFEC')
 ```
 
-You should see a map of only points in France
+You should see the full map of my_private_table
+
 
 ## Create a public table to ensure cache invalidation
 
 This table will simply be updated with a new timestamp anytime one of our privete tables is changed
 
-1. Go to the empty public table we created ```user_poi```
+1. Go to the empty public table we created ```public_table_cache```
 2. Add a column called last_update type date
 3. Add a single row,
 ```sql
 
-    INSERT INTO public.user_poi (last_update) VALUES (now())
+    INSERT INTO public.public_table_cache (last_update) VALUES (now())
 ```
 
 ## Create a trigger
@@ -142,7 +145,7 @@ Let's create a function to do the update of our public table,
 
 ```sql
 
-CREATE OR REPLACE FUNCTION AXHUpdate_Trigger()
+CREATE OR REPLACE FUNCTION AXHTableUpdate_Trigger()
 RETURNS trigger
 AS $$
 DECLARE
@@ -153,13 +156,7 @@ BEGIN
     RAISE EXCEPTION 'Trigger originating from invalid source schema';
   END IF;
 
-  -- for added security for your invalidation trigger, you can add an authenticated
-  -- list of tables where the trigger can originate from
-  -- IF TG_TABLE_NAME NOT IN ('private_poi', 'private_user_list', 'private_groups')
-  --   RAISE EXCEPTION 'Trigger originating from invalid source table';
-  -- END IF;
-
-  sql := 'UPDATE public.user_poi SET last_update = now()';
+  sql := 'UPDATE public.public_table_cache SET last_update = now()';
   EXECUTE sql;
 
   RETURN NULL; 
@@ -167,42 +164,45 @@ END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
 
-_This function updates a small public table ```user_poi``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [row-level-security.html](row-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
+_This function updates a small public table ```public_table_cache``` that we use in our example visualization to link updates in private tables to invalidation of public caches. See [table-level-security.html](table-level-security.html) to see the run-time visualization with 2 layers, 1 being the public table and the second being the function call._
 
-Next let's add some triggers. First to private_poi,
+Next let's add some triggers. First to my_private_table,
 
 ```sql
 
-CREATE TRIGGER invalidate_user_poi_from_private
-    AFTER INSERT OR UPDATE OR DELETE ON private_poi
+CREATE TRIGGER invalidate_public_table_cache_from_private
+    AFTER INSERT OR UPDATE OR DELETE ON my_private_table
     FOR EACH STATEMENT
-    EXECUTE PROCEDURE AXHUpdate_Trigger();
+    EXECUTE PROCEDURE AXHTableUpdate_Trigger();
+```
+
+Next our table permissions,
+
+```sql
+
+CREATE TRIGGER invalidate_public_table_cache_from_private
+    AFTER INSERT OR UPDATE OR DELETE ON table_permissions
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE AXHTableUpdate_Trigger();
 ```
 
 Then our user table,
 
 ```sql
 
-CREATE TRIGGER invalidate_user_poi_from_private_user_list
+CREATE TRIGGER invalidate_public_table_cache_from_private_user_list
     AFTER INSERT OR UPDATE OR DELETE ON private_user_list
     FOR EACH STATEMENT
-    EXECUTE PROCEDURE AXHUpdate_Trigger();
+    EXECUTE PROCEDURE AXHTableUpdate_Trigger();
 ```
 
 Finally our group table
 
 ```sql
 
-CREATE TRIGGER invalidate_user_poi_from_private_groups
+CREATE TRIGGER invalidate_public_table_cache_from_private_groups
     AFTER INSERT OR UPDATE OR DELETE ON private_groups
     FOR EACH STATEMENT
-    EXECUTE PROCEDURE AXHUpdate_Trigger();
+    EXECUTE PROCEDURE AXHTableUpdate_Trigger();
 ```
 
-## See it live
-
-You can see my running app now on 
-
-[http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html](http://andrewxhill.com/cartodb-examples/security-definer/read-only/row-level-security.html)
-
-It creates a visualization from our empty dataset, then applies a query based on the username key pair provided on entry. 

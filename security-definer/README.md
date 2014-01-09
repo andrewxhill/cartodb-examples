@@ -8,3 +8,6 @@ This will show you how to create visualizations with row-level control over whic
  * Ability to cycle keys 
  * Group level permissions so multiple users can share the same permissions
  * Ability to use data from private maps in both visualizations and over the SQL API
+
+## Table level security
+
