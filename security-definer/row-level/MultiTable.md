@@ -1,4 +1,4 @@
-## Multitable example
+## Multi-table row-level security example
 
 If you want to create maps from more than one private table we can easily modify the simple example in [README.md](README.md) to do the trick.
 

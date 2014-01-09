@@ -1,4 +1,4 @@
-## Minimal Read-only Example 
+## Read-only, row-level security on a table
 
 This shows how to create a simple application using a security definer to access data from private tables. Access to private data is granted to Groups based on a group_id. Each member is granted access to their group level security based on their username and secret. 
 
