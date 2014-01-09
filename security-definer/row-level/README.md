@@ -97,7 +97,7 @@ BEGIN
   EXECUTE sql using username, secret INTO group_info;
 
   IF group_info IS NULL THEN
-    RAISE EXCEPTION 'Authorization failed for partner %', partner;
+    RAISE EXCEPTION 'Authorization failed for user %', username;
   END IF;
 
   FOR val_list IN 
