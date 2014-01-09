@@ -4,7 +4,7 @@
 
 This will show you how to create visualizations with row-level control over which users can see what. There are two examples for row-level security on single and private multiple tables, a simple [Single table with row-level permissions](row-level/README.md) example and then building on that a [Multiple tables with row-level permissions](row-level/MultiTable.md) example. They are just what they say, examples that have a single private table or multiple private tables that can be accessed by defined users with known keys. 
 
-## Features
+#### Features
 
  * Multiple users with unique keys
  * Ability to cycle keys 
