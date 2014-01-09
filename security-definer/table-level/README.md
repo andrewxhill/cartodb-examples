@@ -67,7 +67,7 @@ You may have noticed that we assigned our users above to two groups, 1 and 2. Th
 ```sql 
 
    INSERT INTO table_permissions (tablename, group_id) 
-   VALUES ('my_private_table', {1, 2})
+   VALUES ('my_private_table', '{1, 2}')
 ```
 
 This will give your "management team "(1) and "sales team" (2) as defined in Group Setup above, access to this full table.  
