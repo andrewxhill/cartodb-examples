@@ -78,6 +78,8 @@ END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 ```
 
+This function currently requires that all tables that are included as public use the exact same schema
+
 ## Add new tables with private data
 
 You can now add any new private table with group defined data access to your account. To do so assuming your new data table is named ```new_table_name```,
