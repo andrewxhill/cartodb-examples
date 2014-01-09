@@ -95,14 +95,14 @@ BEGIN
   END IF;
 
   -- Check that data is being requested from a valid table
-  sql := 'SELECT cartodb_id FROM public.table_permissions WHERE lower(tablename) = lower($1) AND $2 = ANY(group_id)'';
+  sql := 'SELECT cartodb_id FROM public.table_permissions WHERE lower(tablename) = lower($1) AND $2 = ANY(group_id)';
   EXECUTE sql USING tablename, group_info.group_id INTO table_id;
 
   IF table_id IS NULL THEN
     RAISE EXCEPTION 'Invalid source table: %', tablename;
   END IF;
 
-  sql := 'SELECT * FROM public.'|| tablename';
+  sql := 'SELECT * FROM public.'|| tablename;
   FOR val_list IN EXECUTE sql
   LOOP 
     RETURN NEXT val_list; 
