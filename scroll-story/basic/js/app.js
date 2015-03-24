@@ -118,7 +118,7 @@ var viz = {
       mapLayers[1].setOptions({
             sql: "SELECT *, 1 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND  cartodb_id IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) union all SELECT *, 2 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND cartodb_id NOT IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) UNION ALL SELECT *, 3 as layer FROM buildings_1854 WHERE cartodb_id IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL) AND cartodb_id NOT IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) UNION ALL SELECT *, 4 as layer FROM buildings_1854 WHERE cartodb_id NOT IN (SELECT building_id from directory_1854 WHERE building_id IS NOT NULL) AND  cartodb_id NOT IN (SELECT building_id from directory_1839 WHERE building_id IS NOT NULL)",
             interaction: false,
-            cartocss:  "#{{table_name}}{polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 1;  [layer = 1] {   polygon-fill: violet;  polygon-opacity: 1;  }  [layer = 2] {   polygon-fill: red;  polygon-opacity: 0.7;  }  [layer = 3] {   polygon-fill: yellow;  polygon-opacity: 0.7;  }}"
+            cartocss:  "#directory_1854{polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 1;  [layer = 1] {   polygon-fill: violet;  polygon-opacity: 1;  }  [layer = 2] {   polygon-fill: red;  polygon-opacity: 0.7;  }  [layer = 3] {   polygon-fill: yellow;  polygon-opacity: 0.7;  }}"
       });
     }, 500)
   },
@@ -139,7 +139,7 @@ var viz = {
       mapLayers[1].setOptions({
             sql: "SELECT * FROM buildings_1854",
             interaction: false,
-            cartocss:  "#{{table_name}}{  polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 0.6;  [type='shingle roof']{   polygon-fill: #fc0b82;    polygon-opacity: 0.7;  }  [type='slate or metal']{  polygon-fill: #4a8dcb;    polygon-opacity: 0.7;  }  [type='wood or framed'], [type='framed dwelling']{  polygon-fill: #f2b357;    polygon-opacity: 0.7;  }  [type='brick or stone']{  polygon-fill: #92d42d;    polygon-opacity: 0.7;  }  [hazardous=true]{   line-width: 0.4;    line-color: #FF0000;  }}"
+            cartocss:  "#directory_1854{  polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 0.6;  [type='shingle roof']{   polygon-fill: #fc0b82;    polygon-opacity: 0.7;  }  [type='slate or metal']{  polygon-fill: #4a8dcb;    polygon-opacity: 0.7;  }  [type='wood or framed'], [type='framed dwelling']{  polygon-fill: #f2b357;    polygon-opacity: 0.7;  }  [type='brick or stone']{  polygon-fill: #92d42d;    polygon-opacity: 0.7;  }  [hazardous=true]{   line-width: 0.4;    line-color: #FF0000;  }}"
       });
     }, 500)
   },
@@ -164,7 +164,7 @@ var viz = {
       mapLayers[1].setOptions({
             sql: "SELECT * FROM buildings_1854",
             interaction: false,
-            cartocss:  "#{{table_name}}{  polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 0.6;  [type='shingle roof']{   polygon-fill: #fc0b82;    polygon-opacity: 0.7;  }  [type='slate or metal']{  polygon-fill: #4a8dcb;    polygon-opacity: 0.7;  }  [type='wood or framed'], [type='framed dwelling']{  polygon-fill: #f2b357;    polygon-opacity: 0.7;  }  [type='brick or stone']{  polygon-fill: #92d42d;    polygon-opacity: 0.7;  }  [hazardous=true]{   line-width: 0.4;    line-color: #FF0000;  }}"
+            cartocss:  "#directory_1854{  polygon-fill: white;  polygon-opacity: 0.2;  line-width: 0;  line-color: #FFF;  line-opacity: 0.6;  [type='shingle roof']{   polygon-fill: #fc0b82;    polygon-opacity: 0.7;  }  [type='slate or metal']{  polygon-fill: #4a8dcb;    polygon-opacity: 0.7;  }  [type='wood or framed'], [type='framed dwelling']{  polygon-fill: #f2b357;    polygon-opacity: 0.7;  }  [type='brick or stone']{  polygon-fill: #92d42d;    polygon-opacity: 0.7;  }  [hazardous=true]{   line-width: 0.4;    line-color: #FF0000;  }}"
           });
     },500);
   },
@@ -181,7 +181,7 @@ var viz = {
       mapLayers[1].setOptions({
                   sql: "WITH nms AS (SELECT name FROM (SELECT count(distinct directory) d, count(distinct building_id) b, name, profession FROM directory_names WHERE profession != '' group by name, profession) a WHERE d = 2 AND b = 2), f AS (SELECT name_id, building_id, lower(trim(both ' ' from profession)) as profession FROM directory_1854 WHERE name_id in (SELECT name FROM nms)) SELECT ST_Transform((SELECT ST_Centroid(the_geom) FROM buildings_1854 WHERE cartodb_id = f.building_id),3857) as the_geom_webmercator, f.name_id, f.profession FROM f",
                   interaction: false,
-                  cartocss:  "Map{buffer-size: 150;} #{{table_name}}{text-name: [profession];text-face-name: 'DejaVu Sans Book'; text-size: 6; text-fill: #8cc640; text-allow-overlap: false; text-halo-fill: #FFF; text-halo-radius: 0.3; [zoom>13]{text-size: 8;[zoom>14]{text-size: 10;[zoom>15]{text-size: 14;}}}}"
+                  cartocss:  "Map{buffer-size: 150;} #directory_1854{text-name: [profession];text-face-name: 'DejaVu Sans Book'; text-size: 6; text-fill: #8cc640; text-allow-overlap: false; text-halo-fill: #FFF; text-halo-radius: 0.3; [zoom>13]{text-size: 8;[zoom>14]{text-size: 10;[zoom>15]{text-size: 14;}}}}"
               });
     },500);
   },
